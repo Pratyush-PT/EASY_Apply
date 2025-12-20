@@ -13,8 +13,13 @@ export async function POST(req) {
     }
 
     const token = auth.split(" ")[1];
+
+    if (!token) {
+  return Response.json({ error: "Invalid token format" }, { status: 401 });
+}
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    // console.log(decoded);
+    //  console.log(decoded);
     const admin = await User.findById(decoded.id);
     if (!admin || admin.role !== "admin") {
       return Response.json({ error: "Forbidden" }, { status: 403 });
