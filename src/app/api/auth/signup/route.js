@@ -7,7 +7,7 @@ export async function POST(req) {
   try {
     let body;
 
-    // ✅ Safe JSON parsing
+    //  Safe JSON parsing
     try {
       body = await req.json();
     } catch {
@@ -44,7 +44,7 @@ export async function POST(req) {
       password: hashedPassword,
     });
 
-    // ✅ ALWAYS return JSON
+    // ALWAYS return JSON
     return NextResponse.json(
       {
         success: true,
@@ -59,7 +59,7 @@ export async function POST(req) {
   } catch (error) {
     console.error("Signup error:", error);
 
-    // ✅ Even crashes return JSON
+    //  Even crashes return JSON
     return NextResponse.json(
       { success: false, error: "Internal server error" },
       { status: 500 }
