@@ -1,23 +1,26 @@
-import Link from "next/link";
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      // User not logged in → Signup
+      router.replace("/signup");
+    } else {
+      // User logged in → Jobs dashboard
+      router.replace("/jobs");
+    }
+  }, [router]);
+
   return (
-    <div className="p-6 max-w-lg mx-auto">
-      <h1 className="text-3xl font-bold mb-4">Welcome to EasyApply</h1>
-
-      <div className="flex flex-col gap-4 mt-6">
-        <Link href="/signup" className="text-blue-400 underline">
-          Go to Signup
-        </Link>
-
-        <Link href="/login" className="text-blue-400 underline">
-          Go to Login
-        </Link>
-
-        <Link href="/profile" className="text-blue-400 underline">
-          Go to Profile
-        </Link>
-      </div>
+    <div className="min-h-screen flex items-center justify-center">
+      <p className="text-gray-400">Redirecting...</p>
     </div>
   );
 }
