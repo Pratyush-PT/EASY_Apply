@@ -6,9 +6,10 @@ export async function GET() {
     await connectDB();
     const jobs = await Job.find().sort({ createdAt: -1 });
     return Response.json(jobs);
-  } catch (err) {
+  } catch (error) {
+    console.error(error);
     return Response.json(
-      { error: "Failed to fetch jobs" },
+      { message: "Failed to fetch jobs" },
       { status: 500 }
     );
   }

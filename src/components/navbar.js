@@ -15,6 +15,8 @@ export default function Navbar() {
         <Link href="/signup" className="hover:text-white transition">Signup</Link>
         <Link href="/login" className="hover:text-white transition">Login</Link>
         <Link href="/profile" className="hover:text-white transition">Profile</Link>
+        <Link href="/applications" className="hover:text-green-400 transition">My Applications</Link>
+
       </div>
 
     </nav>
