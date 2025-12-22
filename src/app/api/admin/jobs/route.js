@@ -1,42 +1,49 @@
 import { connectDB } from "@/lib/db";
 import Job from "@/models/Job";
-import User from "@/models/User";
 import jwt from "jsonwebtoken";
+import User from "@/models/User";
 
+async function getAdmin(req) {
+  const token = req.cookies.get("token")?.value;
+  if (!token) return null;
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id);
+    if (user?.role === "admin") return user;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+// CREATE JOB
 export async function POST(req) {
   try {
     await connectDB();
 
-    const auth = req.headers.get("authorization");
-    if (!auth) {
-      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    const admin = await getAdmin(req);
+    if (!admin) {
+      return Response.json(
+        { message: "Unauthorized" },
+        { status: 401 }
+      );
     }
 
-    const token = auth.split(" ")[1];
-
-    if (!token) {
-  return Response.json({ error: "Invalid token format" }, { status: 401 });
-}
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    //  console.log(decoded);
-    const admin = await User.findById(decoded.id);
-    if (!admin || admin.role !== "admin") {
-      return Response.json({ error: "Forbidden" }, { status: 403 });
-    }
+    const body = await req.json();
 
     const {
       company,
       role,
       description,
-      jdPdfUrl,
       eligibleBranches,
+      minCgpa,
       deadline,
-    } = await req.json();
+    } = body;
 
     if (!company || !role || !eligibleBranches?.length) {
       return Response.json(
-        { error: "Missing required fields" },
+        { message: "Missing required fields" },
         { status: 400 }
       );
     }
@@ -45,14 +52,45 @@ export async function POST(req) {
       company,
       role,
       description,
-      jdPdfUrl,
       eligibleBranches,
+      minCgpa,
       deadline,
       postedBy: admin._id,
     });
-     console.log("Job created successfully")
-    return Response.json({ job }, { status: 201 });
+
+    return Response.json(
+      { message: "Job created successfully", job },
+      { status: 201 }
+    );
   } catch (err) {
-    return Response.json({ error: "Server error" }, { status: 500 });
+    console.error(err);
+    return Response.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+// LIST JOBS (ADMIN VIEW)
+export async function GET(req) {
+  try {
+    await connectDB();
+
+    const admin = await getAdmin(req);
+    if (!admin) {
+      return Response.json(
+        { message: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const jobs = await Job.find().sort({ createdAt: -1 });
+
+    return Response.json({ jobs });
+  } catch {
+    return Response.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
