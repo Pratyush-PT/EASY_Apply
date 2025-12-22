@@ -32,14 +32,14 @@ export async function POST(req, context) {
 
     const { jobId } = await context.params;
 
-    const job = await Job.findById(jobId);
+    const job = Job.findById(jobId);
     if (!job) {
       return Response.json(
         { message: "Job not found" },
         { status: 404 }
       );
     }
-    // ❌ Branch eligibility check
+    //  Branch eligibility check
     if (
       job.eligibleBranches &&
       job.eligibleBranches.length > 0 &&
@@ -51,7 +51,7 @@ export async function POST(req, context) {
       );
     }
 
-    // ❌ CGPA eligibility check
+    //  CGPA eligibility check
     if (
       job.minCgpa !== null &&
       job.minCgpa !== undefined &&
@@ -63,7 +63,7 @@ export async function POST(req, context) {
       );
     }
 
-    // ❌ Prevent duplicate applications
+    // Prevent duplicate applications
     const existing = await Application.findOne({
       jobId,
       studentId: user._id,

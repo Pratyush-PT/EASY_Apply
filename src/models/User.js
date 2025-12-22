@@ -45,12 +45,13 @@ const UserSchema = new mongoose.Schema(
 
     cgpa: {
       type: Number,
+      required: true,   
     },
 
     branch: {
-      type: String, // CSE, ECE, ME, etc
+      type: String,
+      required: true,   
     },
-
     resumes: [ResumeSchema],
   },
   { timestamps: true }

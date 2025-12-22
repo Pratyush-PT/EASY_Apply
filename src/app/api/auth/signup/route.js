@@ -7,7 +7,7 @@ export async function POST(req) {
   try {
     let body;
 
-    //  Safe JSON parsing
+    // Safe JSON parsing
     try {
       body = await req.json();
     } catch {
@@ -17,9 +17,10 @@ export async function POST(req) {
       );
     }
 
-    const { name, email, password } = body;
+    const { name, email, password, cgpa, branch } = body;
 
-    if (!name || !email || !password) {
+    // Validate required fields
+    if (!name || !email || !password || cgpa === undefined || !branch) {
       return NextResponse.json(
         { success: false, error: "All fields are required" },
         { status: 400 }
@@ -42,9 +43,10 @@ export async function POST(req) {
       name,
       email,
       password: hashedPassword,
+      cgpa,    
+      branch,  
     });
 
-    // ALWAYS return JSON
     return NextResponse.json(
       {
         success: true,
@@ -52,6 +54,8 @@ export async function POST(req) {
           id: user._id,
           name: user.name,
           email: user.email,
+          cgpa: user.cgpa,
+          branch: user.branch,
         },
       },
       { status: 201 }
@@ -59,7 +63,6 @@ export async function POST(req) {
   } catch (error) {
     console.error("Signup error:", error);
 
-    //  Even crashes return JSON
     return NextResponse.json(
       { success: false, error: "Internal server error" },
       { status: 500 }

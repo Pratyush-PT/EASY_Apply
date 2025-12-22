@@ -116,7 +116,7 @@ export default function JobsPage() {
 
               <p className="mt-1">
                 <strong>Minimum CGPA:</strong>{" "}
-                {job.minCgpa ?? "Not specified"}
+                {job.minCgpa ?? 9}
               </p>
 
               {job.jdPdfUrl && (
