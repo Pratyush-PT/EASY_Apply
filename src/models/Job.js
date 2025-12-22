@@ -17,12 +17,16 @@ const JobSchema = new mongoose.Schema(
     },
 
     jdPdfUrl: {
-      type: String, // uploaded JD PDF
+      type: String,
     },
 
     eligibleBranches: {
-      type: [String], // ["CSE", "IT", "ECE"]
+      type: [String],
       required: true,
+    },
+
+    minCgpa: {
+      type: Number,
     },
 
     deadline: {
@@ -38,5 +42,11 @@ const JobSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.models.Job ||
-  mongoose.model("Job", JobSchema);
+/**
+ * Force-delete cached model so schema updates apply
+ */
+if (mongoose.models.Job) {
+  delete mongoose.models.Job;
+}
+
+export default mongoose.model("Job", JobSchema);

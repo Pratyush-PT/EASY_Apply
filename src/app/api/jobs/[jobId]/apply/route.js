@@ -1,27 +1,26 @@
 import { connectDB } from "@/lib/db";
 import Job from "@/models/Job";
 import Application from "@/models/Application";
-import jwt from "jsonwebtoken";
 import User from "@/models/User";
+import jwt from "jsonwebtoken";
 
 async function getUserFromRequest(req) {
   const token = req.cookies.get("token")?.value;
-
   if (!token) return null;
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     return await User.findById(decoded.id);
-  } catch (err) {
+  } catch {
     return null;
   }
 }
-
 
 export async function POST(req, context) {
   try {
     await connectDB();
 
+    //  Auth
     const user = await getUserFromRequest(req);
     if (!user) {
       return Response.json(
@@ -30,19 +29,22 @@ export async function POST(req, context) {
       );
     }
 
+    // ✅ IMPORTANT FIX (Next.js App Router)
     const { jobId } = await context.params;
 
-    const job = Job.findById(jobId);
+    // ✅ IMPORTANT FIX (await DB call)
+    const job = await Job.findById(jobId);
+
     if (!job) {
       return Response.json(
         { message: "Job not found" },
         { status: 404 }
       );
     }
-    //  Branch eligibility check
+
+    // ❌ Branch eligibility
     if (
-      job.eligibleBranches &&
-      job.eligibleBranches.length > 0 &&
+      job.eligibleBranches?.length > 0 &&
       !job.eligibleBranches.includes(user.branch)
     ) {
       return Response.json(
@@ -51,11 +53,11 @@ export async function POST(req, context) {
       );
     }
 
-    //  CGPA eligibility check
+    // ❌ CGPA eligibility
     if (
       job.minCgpa !== null &&
       job.minCgpa !== undefined &&
-      user.cgpa < job.minCgpa
+      Number(user.cgpa) < Number(job.minCgpa)
     ) {
       return Response.json(
         { message: "Not eligible: CGPA below requirement" },
@@ -63,7 +65,7 @@ export async function POST(req, context) {
       );
     }
 
-    // Prevent duplicate applications
+    // ❌ Duplicate application
     const existing = await Application.findOne({
       jobId,
       studentId: user._id,
@@ -76,6 +78,7 @@ export async function POST(req, context) {
       );
     }
 
+    // ✅ Create application
     const application = await Application.create({
       jobId,
       studentId: user._id,
