@@ -90,10 +90,10 @@ export default function Signup() {
             <option value="CSE">CSE</option>
             
             <option value="ECE">ECE</option>
-            <option value="EIE">IT</option>
-            <option value="EE">ME</option>
+            <option value="EIE">EIE</option>
+            <option value="EE">EE</option>
             <option value="ME">ME</option>
-            <option value="CE">IT</option>
+            <option value="CE">CE</option>
           </select>
 
           <button className="bg-blue-600 hover:bg-blue-700 transition text-white p-3 rounded font-semibold">

@@ -16,8 +16,8 @@ async function getAdmin(req) {
   }
 }
 
-// ✅ LIST JOBS (NO params here)
-export async function GET(req) {
+// GET ONE JOB
+export async function GET(req, { params }) {
   await connectDB();
 
   const admin = await getAdmin(req);
@@ -25,12 +25,16 @@ export async function GET(req) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  const jobs = await Job.find().sort({ createdAt: -1 });
-  return Response.json({ jobs });
+  const job = await Job.findById(params.jobId);
+  if (!job) {
+    return Response.json({ message: "Job not found" }, { status: 404 });
+  }
+
+  return Response.json({ job });
 }
 
-// ✅ CREATE JOB
-export async function POST(req) {
+// UPDATE JOB
+export async function PUT(req, { params }) {
   await connectDB();
 
   const admin = await getAdmin(req);
@@ -39,14 +43,20 @@ export async function POST(req) {
   }
 
   const body = await req.json();
+  const job = await Job.findByIdAndUpdate(params.jobId, body, { new: true });
 
-  const job = await Job.create({
-    ...body,
-    postedBy: admin._id,
-  });
+  return Response.json({ message: "Job updated", job });
+}
 
-  return Response.json(
-    { message: "Job created successfully", job },
-    { status: 201 }
-  );
+// DELETE JOB
+export async function DELETE(req, { params }) {
+  await connectDB();
+
+  const admin = await getAdmin(req);
+  if (!admin) {
+    return Response.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  await Job.findByIdAndDelete(params.jobId);
+  return Response.json({ message: "Job deleted" });
 }
