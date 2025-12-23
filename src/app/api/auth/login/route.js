@@ -19,9 +19,14 @@ export async function POST(req) {
   }
 console.log("JWT_SECRET:", process.env.JWT_SECRET);
 
-  const token = jwt.sign({ id: user._id,role: user.role, }, process.env.JWT_SECRET, {
-    expiresIn: "7d",
-  });
+  const token = jwt.sign(
+  {
+    id: user._id,
+    role: user.role,
+  },
+  process.env.JWT_SECRET,
+  { expiresIn: "7d" }
+);
 
   return NextResponse.json({ success: true, token, user });
 }

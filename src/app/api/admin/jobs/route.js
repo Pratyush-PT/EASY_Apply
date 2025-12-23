@@ -10,87 +10,59 @@ async function getAdmin(req) {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.id);
-    if (user?.role === "admin") return user;
-    return null;
+    return user?.role === "admin" ? user : null;
   } catch {
     return null;
   }
 }
 
-// CREATE JOB
-export async function POST(req) {
-  try {
-    await connectDB();
+/* -------- GET ONE JOB -------- */
+export async function GET(req, { params }) {
+  await connectDB();
 
-    const admin = await getAdmin(req);
-    if (!admin) {
-      return Response.json(
-        { message: "Unauthorized" },
-        { status: 401 }
-      );
-    }
-
-    const body = await req.json();
-
-    const {
-      company,
-      role,
-      description,
-      eligibleBranches,
-      minCgpa,
-      deadline,
-    } = body;
-
-    if (!company || !role || !eligibleBranches?.length) {
-      return Response.json(
-        { message: "Missing required fields" },
-        { status: 400 }
-      );
-    }
-
-    const job = await Job.create({
-      company,
-      role,
-      description,
-      eligibleBranches,
-      minCgpa,
-      deadline,
-      postedBy: admin._id,
-    });
-
-    return Response.json(
-      { message: "Job created successfully", job },
-      { status: 201 }
-    );
-  } catch (err) {
-    console.error(err);
-    return Response.json(
-      { message: "Internal server error" },
-      { status: 500 }
-    );
+  const admin = await getAdmin(req);
+  if (!admin) {
+    return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
+
+  const job = await Job.findById(params.jobId);
+  if (!job) {
+    return Response.json({ message: "Job not found" }, { status: 404 });
+  }
+
+  return Response.json({ job });
 }
 
-// LIST JOBS (ADMIN VIEW)
-export async function GET(req) {
-  try {
-    await connectDB();
+/* -------- UPDATE JOB -------- */
+export async function PUT(req, { params }) {
+  await connectDB();
 
-    const admin = await getAdmin(req);
-    if (!admin) {
-      return Response.json(
-        { message: "Unauthorized" },
-        { status: 401 }
-      );
-    }
-
-    const jobs = await Job.find().sort({ createdAt: -1 });
-
-    return Response.json({ jobs });
-  } catch {
-    return Response.json(
-      { message: "Internal server error" },
-      { status: 500 }
-    );
+  const admin = await getAdmin(req);
+  if (!admin) {
+    return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
+
+  const body = await req.json();
+
+  const job = await Job.findByIdAndUpdate(
+    params.jobId,
+    body,
+    { new: true }
+  );
+
+  return Response.json({ message: "Job updated", job });
+}
+
+/* -------- DELETE JOB -------- */
+export async function DELETE(req, { params }) {
+  await connectDB();
+
+  const admin = await getAdmin(req);
+  if (!admin) {
+    return Response.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  await Job.findByIdAndDelete(params.jobId);
+
+  return Response.json({ message: "Job deleted" });
 }
