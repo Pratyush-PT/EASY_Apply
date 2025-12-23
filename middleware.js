@@ -4,30 +4,39 @@ import jwt from "jsonwebtoken";
 export function middleware(req) {
   const { pathname } = req.nextUrl;
 
-  // Only protect admin routes
-  if (!pathname.startsWith("/admin") && !pathname.startsWith("/api/admin")) {
+  // 🔒 ONLY protect admin APIs
+  if (!pathname.startsWith("/api/admin")) {
     return NextResponse.next();
   }
 
   const token = req.cookies.get("token")?.value;
 
   if (!token) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.json(
+      { message: "Unauthorized" },
+      { status: 401 }
+    );
   }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     if (decoded.role !== "admin") {
-      return NextResponse.redirect(new URL("/", req.url));
+      return NextResponse.json(
+        { message: "Forbidden" },
+        { status: 403 }
+      );
     }
 
     return NextResponse.next();
   } catch {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.json(
+      { message: "Unauthorized" },
+      { status: 401 }
+    );
   }
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/admin/:path*"],
+  matcher: ["/api/admin/:path*"],
 };

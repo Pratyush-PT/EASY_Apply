@@ -1,4 +1,4 @@
-import { connectDB } from "@/lib/db";
+import { connectDB } from "@/lib/dbConnect";
 import Application from "@/models/Application";
 import User from "@/models/User";
 import jwt from "jsonwebtoken";
