@@ -16,6 +16,25 @@ export default function AdminApplicationsPage() {
       .catch(() => setLoading(false));
   }, []);
 
+<<<<<<< HEAD
+=======
+  const updateStatus = async (id, status) => {
+    const res = await fetch(`/api/admin/applications/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    });
+
+    if (res.ok) {
+      setApplications(prev =>
+        prev.map(app =>
+          app._id === id ? { ...app, status } : app
+        )
+      );
+    }
+  };
+
+>>>>>>> safety-local-work
   if (loading) {
     return <div className="p-6 text-white">Loading applications...</div>;
   }
@@ -33,7 +52,10 @@ export default function AdminApplicationsPage() {
               key={app._id}
               className="border border-zinc-700 rounded-lg p-4 bg-zinc-900"
             >
+<<<<<<< HEAD
               {/* Student snapshot info */}
+=======
+>>>>>>> safety-local-work
               <p className="font-semibold text-lg">
                 {app.name || "Unnamed Applicant"}
               </p>
@@ -42,6 +64,7 @@ export default function AdminApplicationsPage() {
                 {app.email || "No email provided"}
               </p>
 
+<<<<<<< HEAD
               {/* Job info (populated from jobId) */}
               <p className="text-sm text-zinc-300 mt-2">
                 Applied for:{" "}
@@ -56,6 +79,17 @@ export default function AdminApplicationsPage() {
 
               {/* Status */}
               <p className="text-sm mt-2">
+=======
+              <p className="text-sm mt-2">
+                Applied for:{" "}
+                <span className="font-medium">
+                  {app.jobId?.role}
+                </span>{" "}
+                @ {app.jobId?.company}
+              </p>
+
+              <p className="mt-2">
+>>>>>>> safety-local-work
                 Status:{" "}
                 <span
                   className={`font-semibold ${
@@ -70,11 +104,29 @@ export default function AdminApplicationsPage() {
                 </span>
               </p>
 
+<<<<<<< HEAD
               {/* Date */}
               <p className="text-xs text-zinc-500 mt-1">
                 Applied on:{" "}
                 {new Date(app.createdAt).toLocaleDateString()}
               </p>
+=======
+              <div className="flex gap-3 mt-4">
+                <button
+                  onClick={() => updateStatus(app._id, "Shortlisted")}
+                  className="px-3 py-1 rounded bg-green-600 hover:bg-green-700 text-sm"
+                >
+                  Shortlist
+                </button>
+
+                <button
+                  onClick={() => updateStatus(app._id, "Rejected")}
+                  className="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-sm"
+                >
+                  Reject
+                </button>
+              </div>
+>>>>>>> safety-local-work
             </div>
           ))}
         </div>
@@ -82,3 +134,7 @@ export default function AdminApplicationsPage() {
     </div>
   );
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> safety-local-work
