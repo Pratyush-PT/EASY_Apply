@@ -1,7 +1,11 @@
 "use client";
+
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Signup() {
+  const router = useRouter();
+
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -16,15 +20,14 @@ export default function Signup() {
     const res = await fetch("/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify(form), // ✅ FIXED (was formData)
     });
 
     const data = await res.json();
-    console.log(data);
 
-    if (data.success) {
-      alert("Signup successful!");
-      window.location.href = "/login";
+    if (res.ok) {
+      // ✅ auto-login already done in backend
+      router.replace("/profile");
     } else {
       alert(data.error || "Signup failed");
     }
@@ -40,6 +43,7 @@ export default function Signup() {
             type="text"
             placeholder="Name"
             className="p-3 bg-zinc-800 border border-zinc-700 rounded"
+            value={form.name}
             onChange={(e) =>
               setForm({ ...form, name: e.target.value })
             }
@@ -50,6 +54,7 @@ export default function Signup() {
             type="email"
             placeholder="Email"
             className="p-3 bg-zinc-800 border border-zinc-700 rounded"
+            value={form.email}
             onChange={(e) =>
               setForm({ ...form, email: e.target.value })
             }
@@ -60,27 +65,28 @@ export default function Signup() {
             type="password"
             placeholder="Password"
             className="p-3 bg-zinc-800 border border-zinc-700 rounded"
+            value={form.password}
             onChange={(e) =>
               setForm({ ...form, password: e.target.value })
             }
             required
           />
 
-          {/* ✅ CGPA */}
           <input
             type="number"
             step="0.01"
             placeholder="CGPA"
             className="p-3 bg-zinc-800 border border-zinc-700 rounded"
+            value={form.cgpa}
             onChange={(e) =>
               setForm({ ...form, cgpa: e.target.value })
             }
             required
           />
 
-          {/* ✅ Branch */}
           <select
             className="p-3 bg-zinc-800 border border-zinc-700 rounded"
+            value={form.branch}
             onChange={(e) =>
               setForm({ ...form, branch: e.target.value })
             }
@@ -95,7 +101,10 @@ export default function Signup() {
             <option value="CE">CE</option>
           </select>
 
-          <button className="bg-blue-600 hover:bg-blue-700 transition text-white p-3 rounded font-semibold">
+          <button
+            type="submit"
+            className="bg-blue-600 hover:bg-blue-700 transition text-white p-3 rounded font-semibold"
+          >
             Sign Up
           </button>
         </form>

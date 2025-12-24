@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/dbConnect";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 export async function POST(req) {
   try {
@@ -43,11 +44,20 @@ export async function POST(req) {
       name,
       email,
       password: hashedPassword,
-      cgpa,    
-      branch,  
+      cgpa,
+      branch,
+      role: "student", // 👈 important for auth
     });
 
-    return NextResponse.json(
+    // ✅ AUTO LOGIN — CREATE JWT
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    // ✅ SET COOKIE
+    const res = NextResponse.json(
       {
         success: true,
         user: {
@@ -56,10 +66,19 @@ export async function POST(req) {
           email: user.email,
           cgpa: user.cgpa,
           branch: user.branch,
+          role: user.role,
         },
       },
       { status: 201 }
     );
+
+    res.cookies.set("token", token, {
+      httpOnly: true,
+      path: "/",
+      sameSite: "lax",
+    });
+
+    return res;
   } catch (error) {
     console.error("Signup error:", error);
 

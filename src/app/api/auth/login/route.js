@@ -12,10 +12,7 @@ export async function POST(req) {
 
     const user = await User.findOne({ email });
     if (!user) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 400 });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -34,17 +31,16 @@ export async function POST(req) {
 
     const res = NextResponse.json({ success: true });
 
-    // 🔑 THIS IS CRITICAL
     res.cookies.set("token", token, {
       httpOnly: true,
-      path: "/",
       sameSite: "lax",
+      path: "/",
       secure: false, // localhost
+      maxAge: 60 * 60 * 24 * 7,
     });
 
     return res;
   } catch (err) {
-    console.error("Login error:", err);
     return NextResponse.json(
       { error: "Login failed" },
       { status: 500 }

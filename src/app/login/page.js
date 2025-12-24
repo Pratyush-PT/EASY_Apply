@@ -12,26 +12,21 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
 
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
 
-      const data = await res.json();
+    const data = await res.json();
 
-      if (res.ok) {
-        // ✅ Cookie already set by backend
-        router.replace("/profile");
-      } else {
-        alert(data.error || "Login failed");
-      }
-    } catch (err) {
-      alert("Something went wrong");
-    } finally {
-      setLoading(false);
+    if (res.ok) {
+      router.replace("/profile");
+    } else {
+      alert(data.error || "Login failed");
     }
+
+    setLoading(false);
   };
 
   return (
@@ -43,7 +38,7 @@ export default function Login() {
           <input
             type="email"
             placeholder="Email"
-            className="p-3 bg-zinc-800 border border-zinc-700 rounded focus:outline-none focus:border-green-500"
+            className="p-3 bg-zinc-800 border border-zinc-700 rounded"
             value={form.email}
             onChange={(e) =>
               setForm({ ...form, email: e.target.value })
@@ -54,7 +49,7 @@ export default function Login() {
           <input
             type="password"
             placeholder="Password"
-            className="p-3 bg-zinc-800 border border-zinc-700 rounded focus:outline-none focus:border-green-500"
+            className="p-3 bg-zinc-800 border border-zinc-700 rounded"
             value={form.password}
             onChange={(e) =>
               setForm({ ...form, password: e.target.value })
@@ -65,7 +60,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="bg-green-600 hover:bg-green-700 transition text-white p-3 rounded font-semibold disabled:opacity-50"
+            className="bg-green-600 hover:bg-green-700 p-3 rounded font-semibold"
           >
             {loading ? "Logging in..." : "Login"}
           </button>
