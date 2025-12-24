@@ -16,7 +16,7 @@ export default function JobsPage() {
         if (!res.ok) throw new Error("Failed to fetch jobs");
         const data = await res.json();
         setJobs(data);
-      } catch (err) {
+      } catch {
         setError("Unable to load jobs");
       } finally {
         setLoading(false);
@@ -26,11 +26,13 @@ export default function JobsPage() {
     fetchJobs();
   }, []);
 
-  // 🔹 Fetch already applied jobs (PERSISTENCE)
+  // 🔹 Fetch already applied jobs (persistence)
   useEffect(() => {
     const fetchAppliedJobs = async () => {
       try {
-        const res = await fetch("/api/applications/me");
+        const res = await fetch("/api/applications/me", {
+          credentials: "include",
+        });
         if (!res.ok) return;
 
         const data = await res.json();
@@ -40,7 +42,7 @@ export default function JobsPage() {
           data.forEach((app) => set.add(app.jobId));
           return set;
         });
-      } catch (err) {
+      } catch {
         console.error("Failed to fetch applied jobs");
       }
     };
@@ -48,29 +50,54 @@ export default function JobsPage() {
     fetchAppliedJobs();
   }, []);
 
-  // 🔹 Handle Apply
+  // 🔹 APPLY HANDLER (RESET LOGIC INCLUDED)
   const handleApply = async (jobId) => {
     try {
-      const res = await fetch(`/api/jobs/${jobId}/apply`, {
+      // 1️⃣ First attempt
+      let res = await fetch("/api/applications", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jobId }),
       });
 
-      const data = await res.json();
+      let data = await res.json();
 
-      // ✅ Applied OR already applied → update UI
-      if (res.status === 201 || res.status === 409) {
+      // 🔴 Already applied → ask for reset
+      if (res.status === 409 && data.alreadyApplied) {
+        const confirmReset = window.confirm(
+          "You have already applied to this job.\n\nDo you want to reset and resubmit your application?"
+        );
+
+        if (!confirmReset) return;
+
+        // 🔁 Force overwrite
+        res = await fetch("/api/applications", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            jobId,
+            force: true,
+          }),
+        });
+
+        if (!res.ok) {
+          alert("Failed to update application");
+          return;
+        }
+
+        alert("Application updated successfully!");
+      }
+
+      // ✅ Success (new or reset)
+      if (res.ok) {
         setAppliedJobs((prev) => {
           const next = new Set(prev);
           next.add(jobId);
           return next;
         });
-        return;
+      } else {
+        alert(data.error || "Failed to apply");
       }
-
-      alert(data.message || "Failed to apply");
     } catch (error) {
       console.error(error);
       alert("Something went wrong while applying");
@@ -106,7 +133,8 @@ export default function JobsPage() {
               <p className="text-lg text-gray-300">{job.role}</p>
 
               <p className="text-sm text-gray-400 mt-1">
-                Deadline: {new Date(job.deadline).toLocaleDateString()}
+                Deadline:{" "}
+                {new Date(job.deadline).toLocaleDateString()}
               </p>
 
               <p className="mt-3">
@@ -116,7 +144,7 @@ export default function JobsPage() {
 
               <p className="mt-1">
                 <strong>Minimum CGPA:</strong>{" "}
-                {job.minCgpa ?? 9}
+                {job.minCgpa ?? "N/A"}
               </p>
 
               {job.jdPdfUrl && (
@@ -131,15 +159,14 @@ export default function JobsPage() {
 
               <div className="mt-5">
                 <button
-                  disabled={isApplied}
                   onClick={() => handleApply(job._id)}
                   className={`px-4 py-2 rounded text-white ${
                     isApplied
-                      ? "bg-gray-600 cursor-not-allowed"
+                      ? "bg-yellow-600 hover:bg-yellow-700"
                       : "bg-green-600 hover:bg-green-700"
                   }`}
                 >
-                  {isApplied ? "Applied" : "Apply"}
+                  {isApplied ? "Re-Apply" : "Apply"}
                 </button>
               </div>
             </div>

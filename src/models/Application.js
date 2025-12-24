@@ -14,14 +14,17 @@ const ApplicationSchema = new mongoose.Schema(
       required: true,
     },
 
-    // SNAPSHOT DATA (copied at apply time)
+    // 🔒 SNAPSHOT DATA (never changes)
     name: String,
     email: String,
-    contact: String,
-    cgpa: Number,
     branch: String,
+    cgpa: Number,
 
-    resumeUrl: String,
+    // 🧠 Dynamic form answers (like Google Forms)
+    answers: {
+      type: Object, // flexible key-value store
+      default: {},
+    },
 
     status: {
       type: String,

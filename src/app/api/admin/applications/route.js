@@ -1,24 +1,50 @@
 import { NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
 import { connectDB } from "@/lib/dbConnect";
 import Application from "@/models/Application";
-import Job from "@/models/Job";     // registers Job model
-import User from "@/models/User";   // registers User model
+import Job from "@/models/Job";   // ensures Job model is registered
+import User from "@/models/User"; // ensures User model is registered
 
 /**
  * GET /api/admin/applications
- * Admin: fetch all job applications
+ * Admin: fetch all applications (sheet view)
+ * Optional: ?jobId=<JOB_ID>
  */
-export async function GET() {
+export async function GET(req) {
   try {
     await connectDB();
 
-    const applications = await Application.find()
+    // 🔐 1️⃣ AUTH — admin only
+    const token = req.cookies.get("token")?.value;
+    if (!token) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (decoded.role !== "admin") {
+      return NextResponse.json(
+        { error: "Forbidden" },
+        { status: 403 }
+      );
+    }
+
+    // 🔍 2️⃣ Optional filter by jobId
+    const { searchParams } = new URL(req.url);
+    const jobId = searchParams.get("jobId");
+
+    const query = jobId ? { jobId } : {};
+
+    // 📊 3️⃣ Fetch applications (sheet rows)
+    const applications = await Application.find(query)
       .populate({
-        path: "jobId",               // ✅ matches schema
+        path: "jobId",
         select: "role company",
       })
       .populate({
-        path: "studentId",           // ✅ FIXED (NOT user / userId)
+        path: "studentId",
         select: "name email",
       })
       .sort({ createdAt: -1 });
@@ -31,7 +57,7 @@ export async function GET() {
     console.error("Error fetching admin applications:", error);
 
     return NextResponse.json(
-      { message: "Failed to fetch applications" },
+      { error: "Failed to fetch applications" },
       { status: 500 }
     );
   }
