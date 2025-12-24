@@ -7,7 +7,7 @@ export async function PATCH(req, { params }) {
   try {
     await connectDB();
 
-    // 🔐 Auth check
+    //  Auth check
     const token = req.cookies.get("token")?.value;
     if (!token) {
       return NextResponse.json(

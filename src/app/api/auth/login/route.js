@@ -10,7 +10,6 @@ export async function POST(req) {
 
     const { email, password } = await req.json();
 
-    // 1. Find user
     const user = await User.findOne({ email });
     if (!user) {
       return NextResponse.json(
@@ -19,50 +18,33 @@ export async function POST(req) {
       );
     }
 
-    // 2. Check password
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) {
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
       return NextResponse.json(
         { error: "Invalid credentials" },
         { status: 401 }
       );
     }
 
-    // 3. Create JWT
     const token = jwt.sign(
-      {
-        id: user._id,
-        role: user.role,
-      },
+      { id: user._id, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 
-    // 4. Set cookie (IMPORTANT)
-    const response = NextResponse.json(
-      {
-        success: true,
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        },
-      },
-      { status: 200 }
-    );
+    const res = NextResponse.json({ success: true });
 
-    response.cookies.set("token", token, {
+    // 🔑 THIS IS CRITICAL
+    res.cookies.set("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      sameSite: "lax",
+      secure: false, // localhost
     });
 
-    return response;
-  } catch (error) {
-    console.error("Login error:", error);
+    return res;
+  } catch (err) {
+    console.error("Login error:", err);
     return NextResponse.json(
       { error: "Login failed" },
       { status: 500 }
