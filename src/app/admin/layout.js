@@ -1,7 +1,10 @@
+import AdminNavbar from "@/components/adminNavbar";
+
 export default function AdminLayout({ children }) {
   return (
-    <section>
-      {children}
-    </section>
+    <>
+      <AdminNavbar />
+      <main>{children}</main>
+    </>
   );
 }

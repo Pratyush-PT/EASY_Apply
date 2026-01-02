@@ -50,51 +50,39 @@ export default function JobsPage() {
     fetchAppliedJobs();
   }, []);
 
-  // 🔹 APPLY HANDLER (RESET LOGIC INCLUDED)
+  // 🔹 APPLY HANDLER
   const handleApply = async (jobId) => {
+    // If already applied, show message and return
+    if (appliedJobs.has(jobId)) {
+      alert("Already applied");
+      return;
+    }
+
     try {
-      // 1️⃣ First attempt
-      let res = await fetch("/api/applications", {
+      const res = await fetch("/api/applications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ jobId }),
       });
 
-      let data = await res.json();
+      const data = await res.json();
 
-      // 🔴 Already applied → ask for reset
-      if (res.status === 409 && data.alreadyApplied) {
-        const confirmReset = window.confirm(
-          "You have already applied to this job.\n\nDo you want to reset and resubmit your application?"
-        );
-
-        if (!confirmReset) return;
-
-        // 🔁 Force overwrite
-        res = await fetch("/api/applications", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            jobId,
-            force: true,
-          }),
-        });
-
-        if (!res.ok) {
-          alert("Failed to update application");
-          return;
-        }
-
-        alert("Application updated successfully!");
-      }
-
-      // ✅ Success (new or reset)
+      // ✅ Success
       if (res.ok) {
         setAppliedJobs((prev) => {
           const next = new Set(prev);
           next.add(jobId);
           return next;
         });
+        alert("Application submitted successfully!");
+      } else if (res.status === 409 && data.alreadyApplied) {
+        // Already applied (edge case)
+        setAppliedJobs((prev) => {
+          const next = new Set(prev);
+          next.add(jobId);
+          return next;
+        });
+        alert("Already applied");
       } else {
         alert(data.error || "Failed to apply");
       }
@@ -160,13 +148,14 @@ export default function JobsPage() {
               <div className="mt-5">
                 <button
                   onClick={() => handleApply(job._id)}
+                  disabled={isApplied}
                   className={`px-4 py-2 rounded text-white ${
                     isApplied
-                      ? "bg-yellow-600 hover:bg-yellow-700"
+                      ? "bg-gray-600 cursor-not-allowed opacity-60"
                       : "bg-green-600 hover:bg-green-700"
                   }`}
                 >
-                  {isApplied ? "Re-Apply" : "Apply"}
+                  {isApplied ? "Applied" : "Apply"}
                 </button>
               </div>
             </div>
@@ -176,3 +165,4 @@ export default function JobsPage() {
     </div>
   );
 }
+

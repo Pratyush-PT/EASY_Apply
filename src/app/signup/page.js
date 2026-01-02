@@ -12,6 +12,7 @@ export default function Signup() {
     password: "",
     cgpa: "",
     branch: "",
+    contact: "",
   });
 
   const handleSubmit = async (e) => {
@@ -100,6 +101,16 @@ export default function Signup() {
             <option value="ME">ME</option>
             <option value="CE">CE</option>
           </select>
+
+          <input
+            type="tel"
+            placeholder="Phone Number (optional)"
+            className="p-3 bg-zinc-800 border border-zinc-700 rounded"
+            value={form.contact}
+            onChange={(e) =>
+              setForm({ ...form, contact: e.target.value })
+            }
+          />
 
           <button
             type="submit"

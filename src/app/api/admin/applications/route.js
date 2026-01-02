@@ -45,7 +45,7 @@ export async function GET(req) {
       })
       .populate({
         path: "studentId",
-        select: "name email",
+        select: "name email cgpa branch contact resumes",
       })
       .sort({ createdAt: -1 });
 

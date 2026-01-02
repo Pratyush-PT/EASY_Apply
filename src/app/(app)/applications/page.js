@@ -44,7 +44,7 @@ export default function ApplicationsPage() {
   if (applications.length === 0) {
     return (
       <p className="p-6 text-gray-400">
-        You haven’t applied to any jobs yet.
+        You haven't applied to any jobs yet.
       </p>
     );
   }
@@ -82,3 +82,4 @@ export default function ApplicationsPage() {
     </div>
   );
 }
+

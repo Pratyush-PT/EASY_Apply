@@ -18,7 +18,7 @@ export async function POST(req) {
       );
     }
 
-    const { name, email, password, cgpa, branch } = body;
+    const { name, email, password, cgpa, branch, contact } = body;
 
     // Validate required fields
     if (!name || !email || !password || cgpa === undefined || !branch) {
@@ -46,6 +46,7 @@ export async function POST(req) {
       password: hashedPassword,
       cgpa,
       branch,
+      contact: contact || undefined,
       role: "student", // 👈 important for auth
     });
 
