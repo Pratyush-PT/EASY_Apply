@@ -7,6 +7,7 @@ export default function JobsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [appliedJobs, setAppliedJobs] = useState(new Set());
+  const [interestedJobs, setInterestedJobs] = useState(new Set());
 
   // 🔹 Fetch all jobs
   useEffect(() => {
@@ -26,28 +27,59 @@ export default function JobsPage() {
     fetchJobs();
   }, []);
 
-  // 🔹 Fetch already applied jobs (persistence)
+  // 🔹 Fetch already applied jobs and interests
   useEffect(() => {
-    const fetchAppliedJobs = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch("/api/applications/me", {
+        // Fetch applied jobs
+        const appsRes = await fetch("/api/applications/me", {
           credentials: "include",
         });
-        if (!res.ok) return;
+        if (appsRes.ok) {
+          const appsData = await appsRes.json();
+          setAppliedJobs(() => {
+            const set = new Set();
+            appsData.forEach((app) => set.add(app.jobId));
+            return set;
+          });
+        }
 
-        const data = await res.json();
-
-        setAppliedJobs(() => {
-          const set = new Set();
-          data.forEach((app) => set.add(app.jobId));
-          return set;
+        // Fetch interested jobs
+        const interestsRes = await fetch("/api/interests", {
+          credentials: "include",
         });
+        if (interestsRes.ok) {
+          const interestsData = await interestsRes.json();
+          setInterestedJobs(() => {
+            const set = new Set();
+            interestsData.interests?.forEach((interest) =>
+              set.add(interest.jobId)
+            );
+            return set;
+          });
+        }
+
+        // Check for deadline notifications
+        const notificationsRes = await fetch("/api/notifications/check", {
+          credentials: "include",
+        });
+        if (notificationsRes.ok) {
+          const notificationsData = await notificationsRes.json();
+          if (notificationsData.notifications?.length > 0) {
+            notificationsData.notifications.forEach((notif) => {
+              const deadlineDate = new Date(notif.deadline).toLocaleDateString();
+              alert(
+                `⏰ Reminder: ${notif.company} - ${notif.role} deadline is approaching!\nDeadline: ${deadlineDate}\n\nDon't forget to apply!`
+              );
+            });
+          }
+        }
       } catch {
-        console.error("Failed to fetch applied jobs");
+        console.error("Failed to fetch data");
       }
     };
 
-    fetchAppliedJobs();
+    fetchData();
   }, []);
 
   // 🔹 APPLY HANDLER
@@ -92,6 +124,62 @@ export default function JobsPage() {
     }
   };
 
+  // 🔹 INTEREST HANDLER
+  const handleInterest = async (jobId) => {
+    const isInterested = interestedJobs.has(jobId);
+
+    try {
+      if (isInterested) {
+        // Remove interest
+        const res = await fetch(`/api/interests?jobId=${jobId}`, {
+          method: "DELETE",
+          credentials: "include",
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          setInterestedJobs((prev) => {
+            const next = new Set(prev);
+            next.delete(jobId);
+            return next;
+          });
+          alert("Removed from interested list");
+        } else {
+          alert(data.error || "Failed to remove interest");
+        }
+      } else {
+        // Add interest
+        const res = await fetch("/api/interests", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ jobId }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          setInterestedJobs((prev) => {
+            const next = new Set(prev);
+            next.add(jobId);
+            return next;
+          });
+          alert("Marked as interested! You'll be notified before the deadline.");
+        } else {
+          const errorMsg = data.error || "Failed to mark interest";
+          alert(errorMsg);
+          if (res.status === 401) {
+            console.error("Authentication error - user may need to log in again");
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Interest handler error:", error);
+      alert("Something went wrong. Please try again.");
+    }
+  };
+
   if (loading) {
     return <p className="p-6 text-gray-400">Loading jobs...</p>;
   }
@@ -111,6 +199,7 @@ export default function JobsPage() {
       <div className="grid gap-6 md:grid-cols-2">
         {jobs.map((job) => {
           const isApplied = appliedJobs.has(job._id);
+          const isInterested = interestedJobs.has(job._id);
 
           return (
             <div
@@ -120,9 +209,19 @@ export default function JobsPage() {
               <h2 className="text-xl font-semibold">{job.company}</h2>
               <p className="text-lg text-gray-300">{job.role}</p>
 
-              <p className="text-sm text-gray-400 mt-1">
+              {job.description && (
+                <div className="mt-3 p-3 bg-zinc-800 rounded border border-zinc-700">
+                  <p className="text-sm text-gray-300 whitespace-pre-wrap">
+                    {job.description}
+                  </p>
+                </div>
+              )}
+
+              <p className="text-sm text-gray-400 mt-3">
                 Deadline:{" "}
-                {new Date(job.deadline).toLocaleDateString()}
+                {job.deadline
+                  ? new Date(job.deadline).toLocaleDateString()
+                  : "No deadline set"}
               </p>
 
               <p className="mt-3">
@@ -145,7 +244,17 @@ export default function JobsPage() {
                 </a>
               )}
 
-              <div className="mt-5">
+              <div className="mt-5 flex gap-3">
+                <button
+                  onClick={() => handleInterest(job._id)}
+                  className={`px-4 py-2 rounded text-white ${
+                    isInterested
+                      ? "bg-orange-600 hover:bg-orange-700"
+                      : "bg-blue-600 hover:bg-blue-700"
+                  }`}
+                >
+                  {isInterested ? "Interested ✓" : "Interested"}
+                </button>
                 <button
                   onClick={() => handleApply(job._id)}
                   disabled={isApplied}

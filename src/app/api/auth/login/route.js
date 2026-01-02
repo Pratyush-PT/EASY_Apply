@@ -29,7 +29,10 @@ export async function POST(req) {
       { expiresIn: "7d" }
     );
 
-    const res = NextResponse.json({ success: true });
+    const res = NextResponse.json({ 
+      success: true,
+      role: user.role 
+    });
 
     res.cookies.set("token", token, {
       httpOnly: true,

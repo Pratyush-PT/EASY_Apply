@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import PasswordInput from "@/components/PasswordInput";
 
 export default function Signup() {
   const router = useRouter();
@@ -10,18 +11,32 @@ export default function Signup() {
     name: "",
     email: "",
     password: "",
-    cgpa: "",
-    branch: "",
-    contact: "",
+    confirmPassword: "",
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validate password confirmation
+    if (form.password !== form.confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    // Validate password length
+    if (form.password.length < 6) {
+      alert("Password must be at least 6 characters long");
+      return;
+    }
+
     const res = await fetch("/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form), // ✅ FIXED (was formData)
+      body: JSON.stringify({
+        name: form.name,
+        email: form.email,
+        password: form.password,
+      }),
     });
 
     const data = await res.json();
@@ -30,7 +45,9 @@ export default function Signup() {
       // ✅ auto-login already done in backend
       router.replace("/profile");
     } else {
-      alert(data.error || "Signup failed");
+      const errorMessage = data.error || data.message || "Signup failed";
+      alert(errorMessage);
+      console.error("Signup error:", data);
     }
   };
 
@@ -62,8 +79,7 @@ export default function Signup() {
             required
           />
 
-          <input
-            type="password"
+          <PasswordInput
             placeholder="Password"
             className="p-3 bg-zinc-800 border border-zinc-700 rounded"
             value={form.password}
@@ -71,45 +87,18 @@ export default function Signup() {
               setForm({ ...form, password: e.target.value })
             }
             required
+            minLength={6}
           />
 
-          <input
-            type="number"
-            step="0.01"
-            placeholder="CGPA"
+          <PasswordInput
+            placeholder="Confirm Password"
             className="p-3 bg-zinc-800 border border-zinc-700 rounded"
-            value={form.cgpa}
+            value={form.confirmPassword}
             onChange={(e) =>
-              setForm({ ...form, cgpa: e.target.value })
+              setForm({ ...form, confirmPassword: e.target.value })
             }
             required
-          />
-
-          <select
-            className="p-3 bg-zinc-800 border border-zinc-700 rounded"
-            value={form.branch}
-            onChange={(e) =>
-              setForm({ ...form, branch: e.target.value })
-            }
-            required
-          >
-            <option value="">Select Branch</option>
-            <option value="CSE">CSE</option>
-            <option value="ECE">ECE</option>
-            <option value="EIE">EIE</option>
-            <option value="EE">EE</option>
-            <option value="ME">ME</option>
-            <option value="CE">CE</option>
-          </select>
-
-          <input
-            type="tel"
-            placeholder="Phone Number (optional)"
-            className="p-3 bg-zinc-800 border border-zinc-700 rounded"
-            value={form.contact}
-            onChange={(e) =>
-              setForm({ ...form, contact: e.target.value })
-            }
+            minLength={6}
           />
 
           <button

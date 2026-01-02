@@ -24,7 +24,8 @@ export async function PATCH(req, { params }) {
       );
     }
 
-    const { applicationId } = params;
+    // Await params in Next.js 15+
+    const { applicationId } = await params;
     const { status } = await req.json();
 
     if (!["Applied", "Shortlisted", "Rejected"].includes(status)) {

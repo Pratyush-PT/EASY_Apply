@@ -42,6 +42,14 @@ export async function POST(req, context) {
       );
     }
 
+    // Check if user has completed their profile
+    if (!user.branch || user.cgpa === undefined || user.cgpa === null) {
+      return Response.json(
+        { message: "Please complete your profile (Branch and CGPA) before applying" },
+        { status: 400 }
+      );
+    }
+
     // ❌ Branch eligibility
     if (
       job.eligibleBranches?.length > 0 &&

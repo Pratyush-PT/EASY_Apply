@@ -45,17 +45,19 @@ const UserSchema = new mongoose.Schema(
 
     cgpa: {
       type: Number,
-      required: true,   
     },
 
     branch: {
       type: String,
-      required: true,   
     },
     resumes: [ResumeSchema],
   },
   { timestamps: true }
 );
 
-export default mongoose.models.User ||
-  mongoose.model("User", UserSchema);
+// Clear cached model if it exists to ensure schema updates apply
+if (mongoose.models.User) {
+  delete mongoose.models.User;
+}
+
+export default mongoose.model("User", UserSchema);

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import PasswordInput from "@/components/PasswordInput";
 
 export default function Login() {
   const router = useRouter();
@@ -21,7 +22,12 @@ export default function Login() {
     const data = await res.json();
 
     if (res.ok) {
-      router.replace("/profile");
+      // Redirect based on user role
+      if (data.role === "admin") {
+        router.replace("/admin");
+      } else {
+        router.replace("/profile");
+      }
     } else {
       alert(data.error || "Login failed");
     }
@@ -46,8 +52,7 @@ export default function Login() {
             required
           />
 
-          <input
-            type="password"
+          <PasswordInput
             placeholder="Password"
             className="p-3 bg-zinc-800 border border-zinc-700 rounded"
             value={form.password}

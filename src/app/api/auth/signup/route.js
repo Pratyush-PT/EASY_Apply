@@ -18,12 +18,20 @@ export async function POST(req) {
       );
     }
 
-    const { name, email, password, cgpa, branch, contact } = body;
+    const { name, email, password } = body;
 
     // Validate required fields
-    if (!name || !email || !password || cgpa === undefined || !branch) {
+    if (!name || !email || !password) {
       return NextResponse.json(
-        { success: false, error: "All fields are required" },
+        { success: false, error: "Name, email, and password are required" },
+        { status: 400 }
+      );
+    }
+
+    // Validate password length
+    if (password.length < 6) {
+      return NextResponse.json(
+        { success: false, error: "Password must be at least 6 characters long" },
         { status: 400 }
       );
     }
@@ -38,16 +46,23 @@ export async function POST(req) {
       );
     }
 
+    // Check if JWT_SECRET is set
+    if (!process.env.JWT_SECRET) {
+      console.error("JWT_SECRET is not set in environment variables");
+      return NextResponse.json(
+        { success: false, error: "Server configuration error" },
+        { status: 500 }
+      );
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
-      cgpa,
-      branch,
-      contact: contact || undefined,
       role: "student", // 👈 important for auth
+      // cgpa, branch, and contact will be set in profile section
     });
 
     // ✅ AUTO LOGIN — CREATE JWT
@@ -65,8 +80,6 @@ export async function POST(req) {
           id: user._id,
           name: user.name,
           email: user.email,
-          cgpa: user.cgpa,
-          branch: user.branch,
           role: user.role,
         },
       },
@@ -82,9 +95,15 @@ export async function POST(req) {
     return res;
   } catch (error) {
     console.error("Signup error:", error);
+    console.error("Error details:", error.message);
+    console.error("Error stack:", error.stack);
 
     return NextResponse.json(
-      { success: false, error: "Internal server error" },
+      { 
+        success: false, 
+        error: error.message || "Internal server error",
+        details: process.env.NODE_ENV === "development" ? error.stack : undefined
+      },
       { status: 500 }
     );
   }

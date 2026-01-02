@@ -40,7 +40,18 @@ export default function AdminJobsPage() {
             <h2 className="text-xl font-semibold">
               {job.company} – {job.role}
             </h2>
-            <p>Min CGPA: {job.minCgpa ?? "N/A"}</p>
+            <p className="text-sm text-zinc-400">Min CGPA: {job.minCgpa ?? "N/A"}</p>
+            
+            <div className="mt-2 flex gap-4 text-sm">
+              <p>
+                <span className="text-zinc-400">Applied:</span>{" "}
+                <span className="text-green-400 font-semibold">{job.appliedCount || 0}</span>
+              </p>
+              <p>
+                <span className="text-zinc-400">Interested (Not Applied):</span>{" "}
+                <span className="text-orange-400 font-semibold">{job.interestedNotApplied || 0}</span>
+              </p>
+            </div>
 
             <div className="mt-3 flex gap-3">
               <button

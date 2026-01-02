@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import PasswordInput from "@/components/PasswordInput";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -293,8 +294,7 @@ export default function ProfilePage() {
               <label className="block text-sm font-medium mb-2">
                 New Password (leave blank to keep current)
               </label>
-              <input
-                type="password"
+              <PasswordInput
                 value={editingUser.password}
                 onChange={(e) =>
                   setEditingUser({ ...editingUser, password: e.target.value })

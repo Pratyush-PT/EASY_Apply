@@ -20,23 +20,6 @@ export default function AdminApplicationsPage() {
       .catch(() => setLoading(false));
   }, []);
 
-  // UPDATE STATUS
-  const updateStatus = async (id, status) => {
-    const res = await fetch(`/api/admin/applications/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ status }),
-    });
-
-    if (res.ok) {
-      setApplications((prev) =>
-        prev.map((app) =>
-          app._id === id ? { ...app, status } : app
-        )
-      );
-    }
-  };
 
   // LOADING
   if (loading) {
@@ -149,45 +132,9 @@ export default function AdminApplicationsPage() {
                 </div>
               )}
 
-              {/* STATUS */}
-              <div className="mt-3 pt-3 border-t border-zinc-700">
-                <p>
-                  <span className="text-zinc-400">Status:</span>{" "}
-                  <span
-                    className={`font-semibold ${
-                      app.status === "Applied"
-                        ? "text-yellow-400"
-                        : app.status === "Shortlisted"
-                        ? "text-green-400"
-                        : "text-red-400"
-                    }`}
-                  >
-                    {app.status}
-                  </span>
-                </p>
-              </div>
-
               {/* ACTIONS */}
               <div className="flex flex-wrap gap-3 mt-4">
-                <button
-                  onClick={() =>
-                    updateStatus(app._id, "Shortlisted")
-                  }
-                  className="px-3 py-1 rounded bg-green-600 hover:bg-green-700 text-sm"
-                >
-                  Shortlist
-                </button>
-
-                <button
-                  onClick={() =>
-                    updateStatus(app._id, "Rejected")
-                  }
-                  className="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-sm"
-                >
-                  Reject
-                </button>
-
-                {/* 🔥 PER‑JOB CSV EXPORT */}
+                {/* PER‑JOB CSV EXPORT */}
                 <button
                   onClick={() =>
                     window.open(

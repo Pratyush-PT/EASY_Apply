@@ -1,7 +1,10 @@
 "use client";
+
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function CreateJob() {
+  const router = useRouter();
   const [form, setForm] = useState({
     company: "",
     role: "",
@@ -10,64 +13,231 @@ export default function CreateJob() {
     minCgpa: "",
     deadline: "",
   });
+  const [jdFile, setJdFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.type !== "application/pdf") {
+        setError("Only PDF files are allowed");
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        setError("File size must be less than 10MB");
+        return;
+      }
+      setJdFile(file);
+      setError("");
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setUploading(true);
 
-    const payload = {
-      ...form,
-      eligibleBranches: form.eligibleBranches
-        .split(",")
-        .map(b => b.trim()),
-      minCgpa: form.minCgpa ? Number(form.minCgpa) : undefined,
-    };
+    try {
+      let jdPdfUrl = null;
 
-    const res = await fetch("/api/admin/jobs", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+      // Upload JD file if provided
+      if (jdFile) {
+        const formData = new FormData();
+        formData.append("jd", jdFile);
 
-    const data = await res.json();
-    if (res.ok) {
-      alert("Job created");
-      window.location.href = "/admin/jobs";
-    } else {
-      alert(data.message || "Failed");
+        const uploadRes = await fetch("/api/admin/jobs/upload-jd", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!uploadRes.ok) {
+          const uploadData = await uploadRes.json();
+          throw new Error(uploadData.error || "Failed to upload job description");
+        }
+
+        const uploadData = await uploadRes.json();
+        jdPdfUrl = uploadData.url;
+      }
+
+      // Create job
+      const payload = {
+        company: form.company.trim(),
+        role: form.role.trim(),
+        description: form.description.trim(),
+        eligibleBranches: form.eligibleBranches
+          .split(",")
+          .map((b) => b.trim())
+          .filter((b) => b.length > 0),
+        minCgpa: form.minCgpa ? Number(form.minCgpa) : undefined,
+        deadline: form.deadline ? new Date(form.deadline).toISOString() : undefined,
+        jdPdfUrl,
+      };
+
+      // Validate required fields
+      if (!payload.company || !payload.role || !payload.eligibleBranches.length) {
+        setError("Company, Role, and Eligible Branches are required");
+        setUploading(false);
+        return;
+      }
+
+      const res = await fetch("/api/admin/jobs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("Job created successfully!");
+        router.push("/admin/jobs");
+      } else {
+        setError(data.message || "Failed to create job");
+      }
+    } catch (err) {
+      setError(err.message || "Something went wrong");
+    } finally {
+      setUploading(false);
     }
   };
 
   return (
-    <div className="p-6 text-white">
-      <h1 className="text-2xl mb-4">Create Job</h1>
+    <div className="p-6 max-w-3xl mx-auto text-white">
+      <h1 className="text-2xl font-bold mb-6">Create Job</h1>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3 max-w-md">
+      {error && (
+        <div className="mb-4 p-3 bg-red-900 border border-red-700 rounded text-red-200">
+          {error}
+        </div>
+      )}
 
-        <input placeholder="Company"
-          onChange={e => setForm({ ...form, company: e.target.value })}
-          className="p-2 text-black" />
+      <form onSubmit={handleSubmit} className="bg-zinc-900 rounded-lg p-6 space-y-6">
+        {/* Company Name Section */}
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Company Name <span className="text-red-400">*</span>
+          </label>
+          <input
+            type="text"
+            value={form.company}
+            onChange={(e) => setForm({ ...form, company: e.target.value })}
+            placeholder="Enter company name"
+            className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded text-white focus:outline-none focus:border-blue-500"
+            required
+          />
+        </div>
 
-        <input placeholder="Role"
-          onChange={e => setForm({ ...form, role: e.target.value })}
-          className="p-2 text-black" />
+        {/* Role Section */}
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Role <span className="text-red-400">*</span>
+          </label>
+          <input
+            type="text"
+            value={form.role}
+            onChange={(e) => setForm({ ...form, role: e.target.value })}
+            placeholder="Enter job role (e.g., SDE Intern, Software Engineer)"
+            className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded text-white focus:outline-none focus:border-blue-500"
+            required
+          />
+        </div>
 
-        <textarea placeholder="Description"
-          onChange={e => setForm({ ...form, description: e.target.value })}
-          className="p-2 text-black" />
+        {/* Description Section */}
+        <div>
+          <label className="block text-sm font-medium mb-2">Description</label>
+          <textarea
+            value={form.description}
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
+            placeholder="Enter job description"
+            rows={5}
+            className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded text-white focus:outline-none focus:border-blue-500 resize-none"
+          />
+        </div>
 
-        <input placeholder="Eligible Branches (CSE,IT)"
-          onChange={e => setForm({ ...form, eligibleBranches: e.target.value })}
-          className="p-2 text-black" />
+        {/* Job Description File Upload Section */}
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Job Description File (PDF)
+          </label>
+          <input
+            type="file"
+            accept=".pdf"
+            onChange={handleFileChange}
+            className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded text-white file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700"
+          />
+          {jdFile && (
+            <p className="mt-2 text-sm text-green-400">
+              Selected: {jdFile.name}
+            </p>
+          )}
+          <p className="mt-1 text-xs text-zinc-400">
+            Maximum file size: 10MB
+          </p>
+        </div>
 
-        <input placeholder="Min CGPA"
-          onChange={e => setForm({ ...form, minCgpa: e.target.value })}
-          className="p-2 text-black" />
+        {/* Eligible Branches Section */}
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Eligible Branches <span className="text-red-400">*</span>
+          </label>
+          <input
+            type="text"
+            value={form.eligibleBranches}
+            onChange={(e) => setForm({ ...form, eligibleBranches: e.target.value })}
+            placeholder="Enter branches separated by commas (e.g., CSE, IT, ECE)"
+            className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded text-white focus:outline-none focus:border-blue-500"
+            required
+          />
+          <p className="mt-1 text-xs text-zinc-400">
+            Separate multiple branches with commas
+          </p>
+        </div>
 
-        <input type="date"
-          onChange={e => setForm({ ...form, deadline: e.target.value })}
-          className="p-2 text-black" />
+        {/* Min CGPA Section */}
+        <div>
+          <label className="block text-sm font-medium mb-2">Minimum CGPA Required</label>
+          <input
+            type="number"
+            step="0.01"
+            min="0"
+            max="10"
+            value={form.minCgpa}
+            onChange={(e) => setForm({ ...form, minCgpa: e.target.value })}
+            placeholder="Enter minimum CGPA (e.g., 7.5)"
+            className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded text-white focus:outline-none focus:border-blue-500"
+          />
+        </div>
 
-        <button className="bg-blue-600 p-2">Create</button>
+        {/* Deadline Section */}
+        <div>
+          <label className="block text-sm font-medium mb-2">Application Deadline</label>
+          <input
+            type="date"
+            value={form.deadline}
+            onChange={(e) => setForm({ ...form, deadline: e.target.value })}
+            className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded text-white focus:outline-none focus:border-blue-500"
+          />
+        </div>
+
+        {/* Submit Button */}
+        <div className="flex gap-3 pt-4">
+          <button
+            type="submit"
+            disabled={uploading}
+            className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded font-semibold transition"
+          >
+            {uploading ? "Creating..." : "Create Job"}
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push("/admin/jobs")}
+            disabled={uploading}
+            className="px-6 py-3 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-500 disabled:cursor-not-allowed text-white rounded font-semibold transition"
+          >
+            Cancel
+          </button>
+        </div>
       </form>
     </div>
   );
