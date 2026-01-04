@@ -28,6 +28,18 @@ export async function POST(req) {
       );
     }
 
+    // Validate email format (NIT Silchar Student ID only)
+    const emailRegex = /^[a-zA-Z0-9._]+_ug_\d{2}@(cse|ece|eie|ee|me|ce)\.nits\.ac\.in$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Invalid Email! Please use your institute email ID (e.g., name_ug_23@cse.nits.ac.in)."
+        },
+        { status: 400 }
+      );
+    }
+
     // Validate password length
     if (password.length < 6) {
       return NextResponse.json(
@@ -99,8 +111,8 @@ export async function POST(req) {
     console.error("Error stack:", error.stack);
 
     return NextResponse.json(
-      { 
-        success: false, 
+      {
+        success: false,
         error: error.message || "Internal server error",
         details: process.env.NODE_ENV === "development" ? error.stack : undefined
       },

@@ -43,7 +43,10 @@ export async function PUT(req) {
       user.email = email;
     }
     if (branch !== undefined) user.branch = branch;
-    if (cgpa !== undefined) user.cgpa = cgpa;
+    if (cgpa !== undefined) {
+      // Fix precision: round to 2 decimal places
+      user.cgpa = Math.round(parseFloat(cgpa) * 100) / 100;
+    }
     if (contact !== undefined) user.contact = contact;
     if (password !== undefined && password.trim() !== "") {
       // Hash new password

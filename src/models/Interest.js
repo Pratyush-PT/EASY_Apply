@@ -28,3 +28,4 @@ InterestSchema.index({ jobId: 1, studentId: 1 }, { unique: true });
 export default mongoose.models.Interest ||
   mongoose.model("Interest", InterestSchema);
 
+

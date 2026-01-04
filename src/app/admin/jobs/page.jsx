@@ -40,16 +40,28 @@ export default function AdminJobsPage() {
             <h2 className="text-xl font-semibold">
               {job.company} – {job.role}
             </h2>
-            <p className="text-sm text-zinc-400">Min CGPA: {job.minCgpa ?? "N/A"}</p>
-            
-            <div className="mt-2 flex gap-4 text-sm">
+            <p className="text-sm text-zinc-400 mt-1">Min CGPA: {job.minCgpa ?? "N/A"}</p>
+            <p className="text-sm text-zinc-300 mt-2"><strong>Description:</strong> {job.description || "N/A"}</p>
+            <p className="text-sm text-zinc-300"><strong>Eligible Branches:</strong> {job.eligibleBranches?.join(", ") || "All"}</p>
+            <p className="text-sm text-zinc-300">
+              <strong>Deadline:</strong> {job.deadline ? new Date(job.deadline).toLocaleDateString("en-GB") : "N/A"}
+            </p>
+            {job.jdPdfUrl && (
+              <p className="text-sm mt-1">
+                <a href={job.jdPdfUrl} target="_blank" className="text-blue-400 underline hover:text-blue-300">
+                  View JD PDF
+                </a>
+              </p>
+            )}
+
+            <div className="mt-4 flex gap-6 text-sm bg-zinc-800 p-3 rounded">
               <p>
                 <span className="text-zinc-400">Applied:</span>{" "}
-                <span className="text-green-400 font-semibold">{job.appliedCount || 0}</span>
+                <span className="text-green-400 font-bold text-base">{job.appliedCount || 0}</span>
               </p>
               <p>
                 <span className="text-zinc-400">Interested (Not Applied):</span>{" "}
-                <span className="text-orange-400 font-semibold">{job.interestedNotApplied || 0}</span>
+                <span className="text-orange-400 font-bold text-base">{job.interestedNotApplied || 0}</span>
               </p>
             </div>
 

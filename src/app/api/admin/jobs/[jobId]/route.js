@@ -1,4 +1,5 @@
-import { connectDB } from "@/lib/db";
+// force rebuild
+import { connectDB } from "@/lib/dbConnect";
 import Job from "@/models/Job";
 import jwt from "jsonwebtoken";
 import User from "@/models/User";
@@ -20,12 +21,14 @@ async function getAdmin(req) {
 export async function GET(req, { params }) {
   await connectDB();
 
+  const { jobId } = await params;
+
   const admin = await getAdmin(req);
   if (!admin) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  const job = await Job.findById(params.jobId);
+  const job = await Job.findById(jobId);
   if (!job) {
     return Response.json({ message: "Job not found" }, { status: 404 });
   }
@@ -37,13 +40,15 @@ export async function GET(req, { params }) {
 export async function PUT(req, { params }) {
   await connectDB();
 
+  const { jobId } = await params;
+
   const admin = await getAdmin(req);
   if (!admin) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 
   const body = await req.json();
-  const job = await Job.findByIdAndUpdate(params.jobId, body, { new: true });
+  const job = await Job.findByIdAndUpdate(jobId, body, { new: true });
 
   return Response.json({ message: "Job updated", job });
 }
@@ -52,11 +57,13 @@ export async function PUT(req, { params }) {
 export async function DELETE(req, { params }) {
   await connectDB();
 
+  const { jobId } = await params;
+
   const admin = await getAdmin(req);
   if (!admin) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  await Job.findByIdAndDelete(params.jobId);
+  await Job.findByIdAndDelete(jobId);
   return Response.json({ message: "Job deleted" });
 }

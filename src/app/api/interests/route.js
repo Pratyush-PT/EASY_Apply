@@ -67,6 +67,65 @@ export async function POST(req) {
       });
     }
 
+    // 🛡️ ELIGIBILITY CHECKS
+    const job = await import("@/models/Job").then((mod) =>
+      mod.default.findById(jobId)
+    );
+
+    if (!job) {
+      return NextResponse.json({ error: "Job not found" }, { status: 404 });
+    }
+
+    // 1. Profile Completion Check
+    if (
+      !student.resumes ||
+      student.resumes.length === 0 ||
+      !student.branch ||
+      !student.cgpa ||
+      !student.contact
+    ) {
+      return NextResponse.json(
+        {
+          error: "Please fill all the details in your profile page (Resume, Branch, CGPA, Contact) before marking interest.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // 2. Deadline Check
+    if (job.deadline && new Date(job.deadline) < new Date()) {
+      return NextResponse.json(
+        { error: "You are not eligible: Application deadline has passed." },
+        { status: 400 }
+      );
+    }
+
+    // 3. Branch Eligibility Check
+    if (
+      job.eligibleBranches &&
+      job.eligibleBranches.length > 0 &&
+      !job.eligibleBranches.includes(student.branch)
+    ) {
+      return NextResponse.json(
+        {
+          error: `You are not eligible: This job is open for ${job.eligibleBranches.join(
+            ", "
+          )} branches only.`,
+        },
+        { status: 400 }
+      );
+    }
+
+    // 4. CGPA Eligibility Check
+    if (job.minCgpa && student.cgpa < job.minCgpa) {
+      return NextResponse.json(
+        {
+          error: `You are not eligible: Minimum CGPA required is ${job.minCgpa}. Your CGPA is ${student.cgpa}.`,
+        },
+        { status: 400 }
+      );
+    }
+
     // Create interest
     const interest = await Interest.create({
       jobId,
