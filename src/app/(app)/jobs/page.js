@@ -67,7 +67,7 @@ export default function JobsPage() {
           const notificationsData = await notificationsRes.json();
           if (notificationsData.notifications?.length > 0) {
             notificationsData.notifications.forEach((notif) => {
-              const deadlineDate = new Date(notif.deadline).toLocaleDateString();
+              const deadlineDate = new Date(notif.deadline).toLocaleDateString("en-GB");
               alert(
                 `⏰ Reminder: ${notif.company} - ${notif.role} deadline is approaching!\nDeadline: ${deadlineDate}\n\nDon't forget to apply!`
               );
@@ -220,7 +220,7 @@ export default function JobsPage() {
               <p className="text-sm text-gray-400 mt-3">
                 Deadline:{" "}
                 {job.deadline
-                  ? new Date(job.deadline).toLocaleDateString()
+                  ? new Date(job.deadline).toLocaleDateString('en-GB')
                   : "No deadline set"}
               </p>
 

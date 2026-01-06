@@ -1,5 +1,5 @@
 // Script to setup admin account
-const fetch = require('node-fetch');
+// Node.js 18+ has built-in fetch
 
 async function setupAdmin() {
   try {
@@ -15,7 +15,7 @@ async function setupAdmin() {
     });
 
     const data = await response.json();
-    
+
     if (response.ok) {
       console.log('✅ Admin account setup successful!');
       console.log('Email:', data.admin.email);

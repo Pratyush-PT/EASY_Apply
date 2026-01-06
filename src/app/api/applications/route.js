@@ -93,13 +93,6 @@ export async function POST(req) {
       );
     }
 
-    // 2. Deadline Check
-    if (job.deadline && new Date(job.deadline) < new Date()) {
-      return NextResponse.json(
-        { error: "You are not eligible: Application deadline has passed." },
-        { status: 400 }
-      );
-    }
 
     // 3. Branch Eligibility Check
     if (
@@ -123,6 +116,14 @@ export async function POST(req) {
         {
           error: `You are not eligible: Minimum CGPA required is ${job.minCgpa}. Your CGPA is ${user.cgpa}.`,
         },
+        { status: 400 }
+      );
+    }
+
+    // 5. Deadline Check
+    if (job.deadline && new Date(job.deadline) < new Date()) {
+      return NextResponse.json(
+        { error: "You are not eligible: Application deadline has passed." },
         { status: 400 }
       );
     }
