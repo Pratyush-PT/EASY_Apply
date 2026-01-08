@@ -21,7 +21,7 @@ export default function AdminJobsPage() {
   if (loading) return <p className="p-6">Loading jobs...</p>;
 
   return (
-    <div className="p-6 text-white">
+    <div className="p-4 md:p-6 text-white">
       <h1 className="text-2xl font-bold mb-6">Admin – Jobs</h1>
 
       <button

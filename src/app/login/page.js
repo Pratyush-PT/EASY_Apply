@@ -41,7 +41,7 @@ export default function Login() {
       {/* Background Gradient Blob */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-900/20 rounded-full blur-[100px] pointer-events-none" />
 
-      <div className="glass p-8 rounded-2xl shadow-2xl w-full max-w-md relative z-10 border border-white/10">
+      <div className="glass p-6 md:p-8 rounded-2xl shadow-2xl w-[90%] md:w-full max-w-md relative z-10 border border-white/10">
         <h1 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
           Welcome Back
         </h1>
@@ -51,7 +51,6 @@ export default function Login() {
             <label className="text-xs uppercase tracking-wider text-gray-400 font-semibold ml-1">Email</label>
             <input
               type="email"
-              placeholder="Enter your email"
               className="w-full p-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all font-medium"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
@@ -62,7 +61,6 @@ export default function Login() {
           <div className="space-y-1">
             <label className="text-xs uppercase tracking-wider text-gray-400 font-semibold ml-1">Password</label>
             <PasswordInput
-              placeholder="Enter your password"
               className="w-full p-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all font-medium"
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}

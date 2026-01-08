@@ -31,7 +31,7 @@ export default function AdminApplicationsPage() {
   }
 
   return (
-    <div className="p-6 text-white">
+    <div className="p-4 md:p-6 text-white">
       {/* HEADER */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">
@@ -69,7 +69,7 @@ export default function AdminApplicationsPage() {
                 <p className="font-semibold text-lg">
                   {app.studentId?.name || app.name || "Unnamed Applicant"}
                 </p>
-                
+
                 <div className="grid grid-cols-2 gap-2 mt-2 text-sm">
                   <div>
                     <span className="text-zinc-400">Email:</span>{" "}
@@ -77,21 +77,21 @@ export default function AdminApplicationsPage() {
                       {app.studentId?.email || app.email || "N/A"}
                     </span>
                   </div>
-                  
+
                   <div>
                     <span className="text-zinc-400">Phone:</span>{" "}
                     <span className="text-white">
                       {app.studentId?.contact || "N/A"}
                     </span>
                   </div>
-                  
+
                   <div>
                     <span className="text-zinc-400">CGPA:</span>{" "}
                     <span className="text-white">
                       {app.studentId?.cgpa || app.cgpa || "N/A"}
                     </span>
                   </div>
-                  
+
                   <div>
                     <span className="text-zinc-400">Branch:</span>{" "}
                     <span className="text-white">

@@ -50,7 +50,7 @@ export default function ApplicationsPage() {
   }
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
+    <div className="p-4 md:p-6 max-w-5xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">My Applications</h1>
 
       <div className="space-y-4">

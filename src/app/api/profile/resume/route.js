@@ -28,58 +28,20 @@ export async function POST(req) {
       );
     }
 
-    // Get form data
-    const formData = await req.formData();
-    const file = formData.get("resume");
-    const resumeName = formData.get("name") || "Resume";
+    const body = await req.json();
+    const { name, url } = body;
 
-    if (!file || !(file instanceof File)) {
+    if (!url) {
       return NextResponse.json(
-        { error: "No file uploaded" },
+        { error: "Resume URL is required" },
         { status: 400 }
       );
     }
-
-    // Validate file type (PDF only)
-    if (file.type !== "application/pdf") {
-      return NextResponse.json(
-        { error: "Only PDF files are allowed" },
-        { status: 400 }
-      );
-    }
-
-    // Validate file size (max 5MB)
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    if (file.size > maxSize) {
-      return NextResponse.json(
-        { error: "File size must be less than 5MB" },
-        { status: 400 }
-      );
-    }
-
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = join(process.cwd(), "public", "uploads", "resumes");
-    if (!existsSync(uploadsDir)) {
-      await mkdir(uploadsDir, { recursive: true });
-    }
-
-    // Generate unique filename
-    const timestamp = Date.now();
-    const filename = `${user._id}_${timestamp}_${file.name}`;
-    const filepath = join(uploadsDir, filename);
-
-    // Save file
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    await writeFile(filepath, buffer);
-
-    // Create resume URL
-    const resumeUrl = `/uploads/resumes/${filename}`;
 
     // Add resume to user's resumes array
     user.resumes.push({
-      name: resumeName,
-      url: resumeUrl,
+      name: name || "Resume",
+      url: url,
     });
 
     await user.save();
@@ -87,14 +49,14 @@ export async function POST(req) {
     return NextResponse.json({
       success: true,
       resume: {
-        name: resumeName,
-        url: resumeUrl,
+        name: name || "Resume",
+        url: url,
       },
     });
   } catch (error) {
-    console.error("Resume upload error:", error);
+    console.error("Resume add error:", error);
     return NextResponse.json(
-      { error: "Failed to upload resume" },
+      { error: "Failed to add resume" },
       { status: 500 }
     );
   }
@@ -180,17 +142,8 @@ export async function DELETE(req) {
     user.resumes.splice(resumeIndex, 1);
     await user.save();
 
-    // Delete file from filesystem
-    try {
-      const filename = resumeUrl.split("/").pop();
-      const filepath = join(process.cwd(), "public", resumeUrl);
-      if (existsSync(filepath)) {
-        await unlink(filepath);
-      }
-    } catch (fileError) {
-      console.error("Error deleting file:", fileError);
-      // Continue even if file deletion fails
-    }
+    // Note: We are no longer deleting files since we moved to links.
+    // Old files will remain orphaned on disk for now.
 
     return NextResponse.json({
       success: true,

@@ -64,7 +64,7 @@ export default function Signup() {
       {/* Background Gradient Blob */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-900/20 rounded-full blur-[100px] pointer-events-none" />
 
-      <div className="glass p-8 rounded-2xl shadow-2xl w-full max-w-md relative z-10 border border-white/10">
+      <div className="glass p-6 md:p-8 rounded-2xl shadow-2xl w-[90%] md:w-full max-w-md relative z-10 border border-white/10">
         <h1 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
           Create Account
         </h1>
@@ -74,7 +74,6 @@ export default function Signup() {
             <label className="text-xs uppercase tracking-wider text-gray-400 font-semibold ml-1">Full Name</label>
             <input
               type="text"
-              placeholder="e.g. John Doe"
               className="w-full p-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all font-medium"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -86,7 +85,6 @@ export default function Signup() {
             <label className="text-xs uppercase tracking-wider text-gray-400 font-semibold ml-1">Institute Email</label>
             <input
               type="email"
-              placeholder="name_ug_yy@branch.nits.ac.in"
               className="w-full p-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all font-medium"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
@@ -97,7 +95,6 @@ export default function Signup() {
           <div className="space-y-1">
             <label className="text-xs uppercase tracking-wider text-gray-400 font-semibold ml-1">Password</label>
             <PasswordInput
-              placeholder="Min. 6 characters"
               className="w-full p-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all font-medium"
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
@@ -109,7 +106,6 @@ export default function Signup() {
           <div className="space-y-1">
             <label className="text-xs uppercase tracking-wider text-gray-400 font-semibold ml-1">Confirm Password</label>
             <PasswordInput
-              placeholder="Re-enter password"
               className="w-full p-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all font-medium"
               value={form.confirmPassword}
               onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}

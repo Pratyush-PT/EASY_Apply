@@ -189,7 +189,7 @@ export default function JobsPage() {
   }
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="p-4 md:p-6 max-w-6xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">Available Jobs</h1>
 
       {jobs.length === 0 && (

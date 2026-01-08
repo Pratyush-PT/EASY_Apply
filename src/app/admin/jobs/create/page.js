@@ -12,26 +12,12 @@ export default function CreateJob() {
     eligibleBranches: "",
     minCgpa: "",
     deadline: "",
+    jdPdfUrl: "",
   });
-  const [jdFile, setJdFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (file.type !== "application/pdf") {
-        setError("Only PDF files are allowed");
-        return;
-      }
-      if (file.size > 10 * 1024 * 1024) {
-        setError("File size must be less than 10MB");
-        return;
-      }
-      setJdFile(file);
-      setError("");
-    }
-  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,26 +25,7 @@ export default function CreateJob() {
     setUploading(true);
 
     try {
-      let jdPdfUrl = null;
-
-      // Upload JD file if provided
-      if (jdFile) {
-        const formData = new FormData();
-        formData.append("jd", jdFile);
-
-        const uploadRes = await fetch("/api/admin/jobs/upload-jd", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!uploadRes.ok) {
-          const uploadData = await uploadRes.json();
-          throw new Error(uploadData.error || "Failed to upload job description");
-        }
-
-        const uploadData = await uploadRes.json();
-        jdPdfUrl = uploadData.url;
-      }
+      let jdPdfUrl = form.jdPdfUrl; // Use URL from form link
 
       // Create job
       const payload = {
@@ -103,7 +70,7 @@ export default function CreateJob() {
   };
 
   return (
-    <div className="p-6 max-w-3xl mx-auto text-white">
+    <div className="p-4 md:p-6 max-w-3xl mx-auto text-white">
       <h1 className="text-2xl font-bold mb-6">Create Job</h1>
 
       {error && (
@@ -158,22 +125,15 @@ export default function CreateJob() {
         {/* Job Description File Upload Section */}
         <div>
           <label className="block text-sm font-medium mb-2">
-            Job Description File (PDF)
+            Job Description Drive Link
           </label>
           <input
-            type="file"
-            accept=".pdf"
-            onChange={handleFileChange}
-            className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded text-white file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700"
+            type="url"
+            value={form.jdPdfUrl}
+            onChange={(e) => setForm({ ...form, jdPdfUrl: e.target.value })}
+            placeholder="https://drive.google.com/..."
+            className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded text-white focus:outline-none focus:border-blue-500"
           />
-          {jdFile && (
-            <p className="mt-2 text-sm text-green-400">
-              Selected: {jdFile.name}
-            </p>
-          )}
-          <p className="mt-1 text-xs text-zinc-400">
-            Maximum file size: 10MB
-          </p>
         </div>
 
         {/* Eligible Branches Section */}

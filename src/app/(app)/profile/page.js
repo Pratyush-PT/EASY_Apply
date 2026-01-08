@@ -11,6 +11,7 @@ export default function ProfilePage() {
   const [resumes, setResumes] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [resumeName, setResumeName] = useState("Resume");
+  const [resumeLink, setResumeLink] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [editingUser, setEditingUser] = useState({
     name: "",
@@ -68,44 +69,37 @@ export default function ProfilePage() {
 
   const handleResumeUpload = async (e) => {
     e.preventDefault();
-    const fileInput = e.target.resume;
-    const file = fileInput.files[0];
 
-    if (!file) {
-      alert("Please select a file");
-      return;
-    }
-
-    if (file.type !== "application/pdf") {
-      alert("Only PDF files are allowed");
+    if (!resumeLink) {
+      alert("Please enter a resume link");
       return;
     }
 
     setUploading(true);
 
     try {
-      const formData = new FormData();
-      formData.append("resume", file);
-      formData.append("name", resumeName);
-
       const res = await fetch("/api/profile/resume", {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: resumeName,
+          url: resumeLink,
+        }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        alert("Resume uploaded successfully!");
+        alert("Resume added successfully!");
         setResumeName("Resume");
-        fileInput.value = "";
+        setResumeLink("");
         await fetchResumes();
       } else {
-        alert(data.error || "Failed to upload resume");
+        alert(data.error || "Failed to add resume");
       }
     } catch (error) {
       console.error("Upload error:", error);
-      alert("Something went wrong while uploading");
+      alert("Something went wrong while adding resume");
     } finally {
       setUploading(false);
     }
@@ -199,7 +193,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="p-6 max-w-2xl mx-auto text-white">
+    <div className="p-4 md:p-6 max-w-2xl mx-auto text-white">
       <h1 className="text-2xl font-bold mb-6">Your Profile</h1>
 
       <div className="bg-zinc-900 rounded-lg p-6 mb-6">
@@ -348,7 +342,7 @@ export default function ProfilePage() {
 
       <div className="bg-zinc-900 rounded-lg p-6 mb-6">
         <h2 className="text-xl font-semibold mb-4">Resume</h2>
-        
+
         <form onSubmit={handleResumeUpload} className="mb-4">
           <div className="mb-4">
             <label className="block text-sm font-medium mb-2">
@@ -365,13 +359,14 @@ export default function ProfilePage() {
 
           <div className="mb-4">
             <label className="block text-sm font-medium mb-2">
-              Upload PDF Resume (Max 5MB)
+              Resume Drive Link
             </label>
             <input
-              type="file"
-              name="resume"
-              accept=".pdf"
-              className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded text-white file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-green-600 file:text-white hover:file:bg-green-700"
+              type="url"
+              value={resumeLink}
+              onChange={(e) => setResumeLink(e.target.value)}
+              placeholder="https://drive.google.com/..."
+              className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded text-white"
               required
             />
           </div>
@@ -381,7 +376,7 @@ export default function ProfilePage() {
             disabled={uploading}
             className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-2 rounded font-semibold"
           >
-            {uploading ? "Uploading..." : "Upload Resume"}
+            {uploading ? "Adding..." : "Add Resume"}
           </button>
         </form>
 
@@ -392,9 +387,9 @@ export default function ProfilePage() {
               {resumes.map((resume, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-3 bg-zinc-800 rounded border border-zinc-700"
+                  className="flex flex-col sm:flex-row items-center justify-between p-3 bg-zinc-800 rounded border border-zinc-700 gap-3"
                 >
-                  <div className="flex-1">
+                  <div className="flex-1 w-full sm:w-auto text-center sm:text-left">
                     <p className="font-medium">{resume.name}</p>
                     <p className="text-sm text-gray-400 truncate">{resume.url}</p>
                   </div>
