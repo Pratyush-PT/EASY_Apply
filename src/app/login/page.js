@@ -14,26 +14,31 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
 
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (res.ok) {
-      // Redirect based on user role
-      if (data.role === "admin") {
-        router.replace("/admin");
+      if (res.ok) {
+        // Redirect based on user role
+        if (data.role === "admin") {
+          router.replace("/admin");
+        } else {
+          router.replace("/profile");
+        }
       } else {
-        router.replace("/profile");
+        alert(data.error || "Login failed");
       }
-    } else {
-      alert(data.error || "Login failed");
+    } catch (error) {
+      console.error("Login Error:", error);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (

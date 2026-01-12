@@ -3,8 +3,10 @@ import { connectDB } from "@/lib/dbConnect";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { sendEmail } from "@/lib/sendEmail";
 
 export async function POST(req) {
+  let user;
   try {
     let body;
 
@@ -69,7 +71,9 @@ export async function POST(req) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await User.create({
+    // Define user in outer scope (implied by removal of const here, logic added above)
+    // Actually simpler: just remove const and declare let above.
+    user = await User.create({
       name,
       email,
       password: hashedPassword,
@@ -77,17 +81,26 @@ export async function POST(req) {
       // cgpa, branch, and contact will be set in profile section
     });
 
-    // ✅ AUTO LOGIN — CREATE JWT
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-    // ✅ SET COOKIE
-    const res = NextResponse.json(
+    user.otp = otp;
+    user.otpExpiry = otpExpiry;
+    await user.save();
+
+    // Send OTP via email
+    await sendEmail({
+      to: email,
+      subject: "Your Signup OTP",
+      text: `Welcome to Easy Apply! Your OTP for signup is: ${otp}. It is valid for 10 minutes.`,
+    });
+
+    return NextResponse.json(
       {
         success: true,
+        message: "Signup successful. OTP sent to your email.",
+        step: "otp",
         user: {
           id: user._id,
           name: user.name,
@@ -97,24 +110,26 @@ export async function POST(req) {
       },
       { status: 201 }
     );
-
-    res.cookies.set("token", token, {
-      httpOnly: true,
-      path: "/",
-      sameSite: "lax",
-    });
-
-    return res;
   } catch (error) {
+    // Cleanup: Delete user if email fails (so they can try again)
+    if (user && user._id) {
+      try {
+        console.log(`[Signup Error] Attempting to delete user ${user._id} due to failure...`);
+        await User.findByIdAndDelete(user._id);
+        console.log(`[Signup Error] User ${user._id} deleted successfully.`);
+      } catch (cleanupError) {
+        console.error(`[Signup Error] Failed to delete user ${user._id}:`, cleanupError);
+      }
+    }
+
     console.error("Signup error:", error);
     console.error("Error details:", error.message);
-    console.error("Error stack:", error.stack);
 
+    // Check for specific "Email could not be sent" or credential errors
     return NextResponse.json(
       {
         success: false,
         error: error.message || "Internal server error",
-        details: process.env.NODE_ENV === "development" ? error.stack : undefined
       },
       { status: 500 }
     );

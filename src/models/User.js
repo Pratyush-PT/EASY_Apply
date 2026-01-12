@@ -50,6 +50,12 @@ const UserSchema = new mongoose.Schema(
     branch: {
       type: String,
     },
+    otp: {
+      type: String,
+    },
+    otpExpiry: {
+      type: Date,
+    },
     resumes: [ResumeSchema],
   },
   { timestamps: true }

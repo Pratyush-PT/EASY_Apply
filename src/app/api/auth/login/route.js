@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/dbConnect";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { sendEmail } from "@/lib/sendEmail";
 
 export async function POST(req) {
   try {
@@ -29,9 +30,10 @@ export async function POST(req) {
       { expiresIn: "7d" }
     );
 
-    const res = NextResponse.json({ 
+    const res = NextResponse.json({
       success: true,
-      role: user.role 
+      role: user.role,
+      message: "Login successful"
     });
 
     res.cookies.set("token", token, {
@@ -43,9 +45,11 @@ export async function POST(req) {
     });
 
     return res;
+
   } catch (err) {
+    console.error("Login Error:", err);
     return NextResponse.json(
-      { error: "Login failed" },
+      { error: err.message || "Login failed" },
       { status: 500 }
     );
   }
