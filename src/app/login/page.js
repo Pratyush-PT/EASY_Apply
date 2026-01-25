@@ -25,7 +25,9 @@ export default function Login() {
 
             if (res.ok) {
                 // Redirect based on user role
-                if (data.role === 'admin') {
+                const role = data.role?.toLowerCase()
+                if (role === 'admin') {
+                    console.log('here')
                     router.replace('/admin')
                 } else {
                     router.replace('/profile')
