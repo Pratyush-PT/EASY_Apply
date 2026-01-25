@@ -11,12 +11,44 @@ export async function POST(req) {
 
         const { email, password } = await req.json()
 
-        const user = await User.findOne({ email })
-        if (!user) {
-            return NextResponse.json({ error: 'User not found' }, { status: 400 })
+        // 1. Check for Hardcoded Admin via Env Vars (Recovery/Master Access)
+        const isAdminEnv =
+            process.env.ADMIN_EMAIL &&
+            email === process.env.ADMIN_EMAIL &&
+            process.env.ADMIN_PASSWORD &&
+            password === process.env.ADMIN_PASSWORD
+
+        let user = await User.findOne({ email })
+        let isMatch = false
+
+        if (isAdminEnv) {
+            // If checking against env vars, we force success
+            isMatch = true
+
+            // If user doesn't exist, create them as admin
+            if (!user) {
+                user = await User.create({
+                    name: 'Admin',
+                    email,
+                    password: await bcrypt.hash(password, 10),
+                    role: 'admin',
+                    cgpa: 0,
+                    branch: 'N/A',
+                })
+            }
+            // If user exists but isn't admin, fix it
+            else if (user.role !== 'admin') {
+                user.role = 'admin'
+                await user.save()
+            }
+        } else {
+            // 2. Standard Database Login
+            if (!user) {
+                return NextResponse.json({ error: 'User not found' }, { status: 400 })
+            }
+            isMatch = await bcrypt.compare(password, user.password)
         }
 
-        const isMatch = await bcrypt.compare(password, user.password)
         if (!isMatch) {
             return NextResponse.json(
                 { error: 'Invalid credentials' },
