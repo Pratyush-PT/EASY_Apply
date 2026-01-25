@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
-import jwt from 'jsonwebtoken'
+import { jwtVerify } from 'jose'
 
-export function middleware(req) {
+export async function middleware(req) {
     const { pathname } = req.nextUrl
     const token = req.cookies.get('token')?.value
 
@@ -34,13 +34,15 @@ export function middleware(req) {
         }
 
         try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET)
-            const role = decoded.role?.toLowerCase()
+            const secret = new TextEncoder().encode(process.env.JWT_SECRET)
+            const { payload } = await jwtVerify(token, secret)
+            const role = payload.role?.toLowerCase()
 
             if (role !== 'admin') {
                 return NextResponse.json({ message: 'Forbidden' }, { status: 403 })
             }
-        } catch {
+        } catch (error) {
+            console.error('Middleware Auth Error:', error)
             return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
         }
     }
