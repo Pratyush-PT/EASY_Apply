@@ -31,7 +31,7 @@ export async function POST(req) {
     }
 
     // Validate email format (NIT Silchar Student ID only)
-    const emailRegex = /^[a-zA-Z0-9._]+_ug_\d{2}@(cse|ece|eie|ee|me|ce)\.nits\.ac\.in$/;
+    const emailRegex = /^[a-zA-Z0-9._]+_ug_\d{2}@(cse|ece|ei|ee|mech|ce|civil)\.nits\.ac\.in$/;
     if (!emailRegex.test(email)) {
       return NextResponse.json(
         {
