@@ -56,6 +56,10 @@ const UserSchema = new mongoose.Schema(
     otpExpiry: {
       type: Date,
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
     resumes: [ResumeSchema],
   },
   { timestamps: true }

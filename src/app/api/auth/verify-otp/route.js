@@ -19,9 +19,10 @@ export async function POST(req) {
             return NextResponse.json({ error: "Invalid or expired OTP" }, { status: 400 });
         }
 
-        // Clear OTP
+        // Clear OTP and set verified
         user.otp = undefined;
         user.otpExpiry = undefined;
+        user.isVerified = true;
         await user.save();
 
         // Generate Token (Logic moved from login)

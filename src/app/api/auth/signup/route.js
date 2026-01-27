@@ -53,10 +53,49 @@ export async function POST(req) {
     await connectDB();
 
     const existingUser = await User.findOne({ email });
+    // If user exists:
+    // 1. If verified (isVerified === true or undefined), block them.
+    // 2. If unverified (isVerified === false), update details and resend OTP.
     if (existingUser) {
+      if (existingUser.isVerified !== false) {
+        return NextResponse.json(
+          { success: false, error: "User already exists" },
+          { status: 409 }
+        );
+      }
+
+      // Update existing unverified user
+      const hashedPassword = await bcrypt.hash(password, 10);
+      existingUser.name = name;
+      existingUser.password = hashedPassword;
+      // Generate new OTP
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+      existingUser.otp = otp;
+      existingUser.otpExpiry = otpExpiry;
+      await existingUser.save();
+
+      // Send OTP via email
+      await sendEmail({
+        to: email,
+        subject: "Your Signup OTP",
+        text: `Welcome to Easy Apply! Your OTP for signup is: ${otp}. It is valid for 10 minutes.`,
+      });
+
       return NextResponse.json(
-        { success: false, error: "User already exists" },
-        { status: 409 }
+        {
+          success: true,
+          message: "Signup successful. OTP sent to your email.",
+          step: "otp",
+          user: {
+            id: existingUser._id,
+            name: existingUser.name,
+            email: existingUser.email,
+            role: existingUser.role,
+          },
+        },
+        { status: 201 }
       );
     }
 
