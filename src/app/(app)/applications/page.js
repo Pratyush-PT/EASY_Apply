@@ -34,7 +34,7 @@ export default function ApplicationsPage() {
     }, [])
 
     if (loading) {
-        return <p className='p-6 text-gray-400'>Loading applications...</p>
+        return <p className='p-6 text-gray-600'>Loading applications...</p>
     }
 
     if (error) {
@@ -43,7 +43,7 @@ export default function ApplicationsPage() {
 
     if (applications.length === 0) {
         return (
-            <p className='p-6 text-gray-400'>
+            <p className='p-6 text-gray-600'>
                 {"You haven't applied to any jobs yet."}
             </p>
         )
@@ -62,12 +62,12 @@ export default function ApplicationsPage() {
                     return (
                         <div
                             key={app._id}
-                            className='border border-zinc-700 bg-zinc-900 rounded-lg p-5'
+                            className='border border-gray-200 bg-white rounded-lg p-5 shadow-sm'
                         >
-                            <h2 className='text-xl font-semibold'>{job.company}</h2>
-                            <p className='text-gray-300'>{job.role}</p>
+                            <h2 className='text-xl font-semibold text-slate-800'>{job.company}</h2>
+                            <p className='text-gray-600'>{job.role}</p>
 
-                            <p className='text-sm text-gray-400 mt-1'>
+                            <p className='text-sm text-gray-500 mt-1'>
                                 Applied on{' '}
                                 {new Date(app.createdAt || Date.now()).toLocaleDateString()}
                             </p>

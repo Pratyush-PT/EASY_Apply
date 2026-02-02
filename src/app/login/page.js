@@ -110,35 +110,30 @@ export default function Login() {
     }
 
     return (
-        <div className='min-h-screen flex items-center justify-center bg-black relative overflow-hidden'>
-            {/* Animated Background Blobs */}
-            <div className='absolute inset-0 w-full h-full'>
-                <div className='absolute top-[-10%] left-[-10%] w-96 h-96 bg-purple-500/30 rounded-full blur-[128px] animate-pulse' />
-                <div className='absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-blue-500/30 rounded-full blur-[128px] animate-pulse delay-1000' />
-            </div>
+        <div className='min-h-screen flex items-center justify-center bg-slate-50 relative overflow-hidden'>
 
             {/* Center Card */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className='glass p-6 md:p-8 rounded-2xl shadow-2xl w-[90%] md:w-full max-w-md relative z-10 border border-white/10'
+                className='bg-white p-6 md:p-8 rounded-2xl shadow-lg w-[90%] md:w-full max-w-md relative z-10 border border-gray-200'
             >
                 {/* LOGIN */}
                 {view === 'login' && (
                     <>
-                        <h1 className='text-3xl font-bold mb-8 text-center bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent'>
+                        <h1 className='text-3xl font-bold mb-8 text-center text-slate-800'>
                             Welcome Back
                         </h1>
 
                         <form onSubmit={handleSubmit} className='flex flex-col gap-5'>
                             <div>
-                                <label className='text-xs uppercase tracking-wider text-gray-400 font-semibold'>
+                                <label className='text-xs uppercase tracking-wider text-gray-600 font-semibold'>
                                     Email
                                 </label>
                                 <input
                                     type='email'
-                                    className='w-full p-4 bg-white/5 border border-white/10 rounded-xl text-white'
+                                    className='w-full p-4 bg-gray-50 border border-gray-300 rounded-xl text-slate-800'
                                     value={form.email}
                                     onChange={(e) => setForm({ ...form, email: e.target.value })}
                                     required
@@ -146,11 +141,11 @@ export default function Login() {
                             </div>
 
                             <div>
-                                <label className='text-xs uppercase tracking-wider text-gray-400 font-semibold'>
+                                <label className='text-xs uppercase tracking-wider text-gray-600 font-semibold'>
                                     Password
                                 </label>
                                 <PasswordInput
-                                    className='w-full p-4 bg-white/5 border border-white/10 rounded-xl text-white'
+                                    className='w-full p-4 bg-gray-50 border border-gray-300 rounded-xl text-slate-800'
                                     value={form.password}
                                     onChange={(e) =>
                                         setForm({ ...form, password: e.target.value })
@@ -162,7 +157,7 @@ export default function Login() {
                                     <button
                                         type='button'
                                         onClick={() => setView('forgot-email')}
-                                        className='text-xs text-blue-400 mt-1'
+                                        className='text-xs text-indigo-600 mt-1'
                                     >
                                         Forgot Password?
                                     </button>
@@ -172,7 +167,7 @@ export default function Login() {
                             <button
                                 type='submit'
                                 disabled={loading}
-                                className='w-full bg-white text-black font-bold py-4 rounded-xl'
+                                className='w-full bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700'
                             >
                                 {loading ? 'Logging in...' : 'Login'}
                             </button>
@@ -192,7 +187,7 @@ export default function Login() {
                 {/* FORGOT EMAIL */}
                 {view === 'forgot-email' && (
                     <>
-                        <h1 className='text-2xl font-bold mb-6 text-center text-white'>
+                        <h1 className='text-2xl font-bold mb-6 text-center text-slate-800'>
                             Reset Password
                         </h1>
 
@@ -202,7 +197,7 @@ export default function Login() {
                         >
                             <input
                                 type='email'
-                                className='w-full p-4 bg-white/5 border border-white/10 rounded-xl text-white'
+                                className='w-full p-4 bg-gray-50 border border-gray-300 rounded-xl text-slate-800'
                                 value={forgotEmail}
                                 onChange={(e) => setForgotEmail(e.target.value)}
                                 required
@@ -211,7 +206,7 @@ export default function Login() {
                             <button
                                 type='submit'
                                 disabled={loading}
-                                className='bg-white text-black font-bold py-4 rounded-xl'
+                                className='bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700'
                             >
                                 {loading ? 'Sending OTP...' : 'Send OTP'}
                             </button>
@@ -219,7 +214,7 @@ export default function Login() {
                             <button
                                 type='button'
                                 onClick={() => setView('login')}
-                                className='text-sm text-gray-400'
+                                className='text-sm text-gray-600'
                             >
                                 Back to Login
                             </button>
@@ -230,7 +225,7 @@ export default function Login() {
                 {/* OTP + RESET */}
                 {view === 'forgot-otp' && (
                     <>
-                        <h1 className='text-2xl font-bold mb-6 text-center text-white'>
+                        <h1 className='text-2xl font-bold mb-6 text-center text-slate-800'>
                             Enter OTP
                         </h1>
 
@@ -240,7 +235,7 @@ export default function Login() {
                         >
                             <input
                                 type='text'
-                                className='w-full p-4 bg-white/5 border border-white/10 rounded-xl text-white'
+                                className='w-full p-4 bg-gray-50 border border-gray-300 rounded-xl text-slate-800'
                                 value={forgotOtp}
                                 onChange={(e) => setForgotOtp(e.target.value)}
                                 placeholder='Enter OTP'
@@ -248,7 +243,7 @@ export default function Login() {
                             />
 
                             <PasswordInput
-                                className='w-full p-4 bg-white/5 border border-white/10 rounded-xl text-white'
+                                className='w-full p-4 bg-gray-50 border border-gray-300 rounded-xl text-slate-800'
                                 value={newPassword}
                                 onChange={(e) => setNewPassword(e.target.value)}
                                 required
@@ -257,7 +252,7 @@ export default function Login() {
                             <button
                                 type='submit'
                                 disabled={loading}
-                                className='bg-white text-black font-bold py-4 rounded-xl'
+                                className='bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700'
                             >
                                 Reset Password
                             </button>

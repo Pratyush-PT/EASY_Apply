@@ -189,14 +189,14 @@ export default function ProfilePage() {
   };
 
   if (loading) {
-    return <p className="p-6 text-white">Loading profile...</p>;
+    return <p className="p-6 text-gray-600">Loading profile...</p>;
   }
 
   return (
-    <div className="p-4 md:p-6 max-w-2xl mx-auto text-white">
+    <div className="p-4 md:p-6 max-w-2xl mx-auto text-slate-800">
       <h1 className="text-2xl font-bold mb-6">Your Profile</h1>
 
-      <div className="bg-zinc-900 rounded-lg p-6 mb-6">
+      <div className="bg-white rounded-lg p-6 mb-6 border border-gray-200 shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold">Personal Information</h2>
           {!isEditing && (
@@ -219,7 +219,7 @@ export default function ProfilePage() {
                 onChange={(e) =>
                   setEditingUser({ ...editingUser, name: e.target.value })
                 }
-                className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded text-white"
+                className="w-full p-3 bg-gray-50 border border-gray-300 rounded text-slate-800"
                 required
               />
             </div>
@@ -232,7 +232,7 @@ export default function ProfilePage() {
                 onChange={(e) =>
                   setEditingUser({ ...editingUser, email: e.target.value })
                 }
-                className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded text-white"
+                className="w-full p-3 bg-gray-50 border border-gray-300 rounded text-slate-800"
                 required
               />
             </div>
@@ -244,7 +244,7 @@ export default function ProfilePage() {
                 onChange={(e) =>
                   setEditingUser({ ...editingUser, branch: e.target.value })
                 }
-                className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded text-white"
+                className="w-full p-3 bg-gray-50 border border-gray-300 rounded text-slate-800"
                 required
               >
                 <option value="">Select Branch</option>
@@ -266,7 +266,7 @@ export default function ProfilePage() {
                 onChange={(e) =>
                   setEditingUser({ ...editingUser, cgpa: e.target.value })
                 }
-                className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded text-white"
+                className="w-full p-3 bg-gray-50 border border-gray-300 rounded text-slate-800"
                 required
               />
             </div>
@@ -279,7 +279,7 @@ export default function ProfilePage() {
                 onChange={(e) =>
                   setEditingUser({ ...editingUser, contact: e.target.value })
                 }
-                className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded text-white"
+                className="w-full p-3 bg-gray-50 border border-gray-300 rounded text-slate-800"
                 placeholder="Enter phone number"
               />
             </div>
@@ -293,7 +293,7 @@ export default function ProfilePage() {
                 onChange={(e) =>
                   setEditingUser({ ...editingUser, password: e.target.value })
                 }
-                className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded text-white"
+                className="w-full p-3 bg-gray-50 border border-gray-300 rounded text-slate-800"
                 placeholder="Enter new password"
               />
             </div>
@@ -340,7 +340,7 @@ export default function ProfilePage() {
         )}
       </div>
 
-      <div className="bg-zinc-900 rounded-lg p-6 mb-6">
+      <div className="bg-white rounded-lg p-6 mb-6 border border-gray-200 shadow-sm">
         <h2 className="text-xl font-semibold mb-4">Resume</h2>
 
         <form onSubmit={handleResumeUpload} className="mb-4">
@@ -353,7 +353,7 @@ export default function ProfilePage() {
               value={resumeName}
               onChange={(e) => setResumeName(e.target.value)}
               placeholder="e.g., SDE Resume, Core Resume"
-              className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded text-white"
+              className="w-full p-3 bg-gray-50 border border-gray-300 rounded text-slate-800"
             />
           </div>
 
@@ -366,7 +366,7 @@ export default function ProfilePage() {
               value={resumeLink}
               onChange={(e) => setResumeLink(e.target.value)}
               placeholder="https://drive.google.com/..."
-              className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded text-white"
+              className="w-full p-3 bg-gray-50 border border-gray-300 rounded text-slate-800"
               required
             />
           </div>
@@ -387,11 +387,11 @@ export default function ProfilePage() {
               {resumes.map((resume, index) => (
                 <div
                   key={index}
-                  className="flex flex-col sm:flex-row items-center justify-between p-3 bg-zinc-800 rounded border border-zinc-700 gap-3"
+                  className="flex flex-col sm:flex-row items-center justify-between p-3 bg-gray-50 rounded border border-gray-200 gap-3"
                 >
                   <div className="flex-1 w-full sm:w-auto text-center sm:text-left">
                     <p className="font-medium">{resume.name}</p>
-                    <p className="text-sm text-gray-400 truncate">{resume.url}</p>
+                    <p className="text-sm text-gray-500 truncate">{resume.url}</p>
                   </div>
                   <div className="flex gap-2">
                     <a

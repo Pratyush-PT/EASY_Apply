@@ -100,21 +100,16 @@ export default function Signup() {
     }
 
     return (
-        <div className='min-h-screen flex items-center justify-center relative overflow-hidden'>
-            {/* Animated Background */}
-            <div className='absolute inset-0 w-full h-full pointer-events-none'>
-                <div className='absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-500/20 rounded-full blur-[128px] animate-pulse' />
-                <div className='absolute top-0 right-0 w-[500px] h-[500px] bg-rose-500/20 rounded-full blur-[128px] animate-pulse delay-700' />
-            </div>
+        <div className='min-h-screen flex items-center justify-center relative overflow-hidden bg-slate-50'>
 
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className='w-full max-w-lg relative z-10 p-6'
             >
-                <div className='glass-card p-8 rounded-3xl relative overflow-hidden'>
+                <div className='bg-white border border-gray-200 shadow-lg p-8 rounded-3xl relative overflow-hidden'>
                     {/* Progress Bar */}
-                    <div className='absolute top-0 left-0 h-1 bg-white/10 w-full'>
+                    <div className='absolute top-0 left-0 h-1 bg-gray-200 w-full'>
                         <motion.div
                             initial={{ width: '50%' }}
                             animate={{ width: step === 1 ? '50%' : '100%' }}
@@ -130,10 +125,10 @@ export default function Signup() {
                                 <ShieldCheck className='w-6 h-6' />
                             )}
                         </div>
-                        <h1 className='text-3xl font-bold text-white mb-2'>
+                        <h1 className='text-3xl font-bold text-slate-800 mb-2'>
                             {step === 1 ? 'Create Account' : 'Verify Email'}
                         </h1>
-                        <p className='text-zinc-400'>
+                        <p className='text-gray-600'>
                             {step === 1
                                 ? 'Join the community today'
                                 : 'Enter the OTP sent to your email'}
@@ -151,14 +146,14 @@ export default function Signup() {
                                 className='space-y-4'
                             >
                                 <div className='space-y-1.5'>
-                                    <label className='text-xs uppercase tracking-wider text-zinc-400 font-bold ml-1'>
+                                    <label className='text-xs uppercase tracking-wider text-gray-600 font-bold ml-1'>
                                         Full Name
                                     </label>
                                     <div className='relative'>
-                                        <User className='absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500' />
+                                        <User className='absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500' />
                                         <input
                                             type='text'
-                                            className='w-full pl-12 pr-4 py-3.5 bg-black/20 border border-white/10 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all font-medium'
+                                            className='w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-300 rounded-xl text-slate-800 placeholder-gray-400 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all font-medium'
                                             placeholder='John Doe'
                                             value={form.name}
                                             onChange={(e) =>
@@ -170,14 +165,14 @@ export default function Signup() {
                                 </div>
 
                                 <div className='space-y-1.5'>
-                                    <label className='text-xs uppercase tracking-wider text-zinc-400 font-bold ml-1'>
+                                    <label className='text-xs uppercase tracking-wider text-gray-600 font-bold ml-1'>
                                         Institute Email
                                     </label>
                                     <div className='relative'>
-                                        <Mail className='absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500' />
+                                        <Mail className='absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500' />
                                         <input
                                             type='email'
-                                            className='w-full pl-12 pr-4 py-3.5 bg-black/20 border border-white/10 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all font-medium'
+                                            className='w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-300 rounded-xl text-slate-800 placeholder-gray-400 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all font-medium'
                                             placeholder='name_ug_23@cse.nits.ac.in'
                                             value={form.email}
                                             onChange={(e) =>
@@ -190,13 +185,13 @@ export default function Signup() {
 
                                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                                     <div className='space-y-1.5'>
-                                        <label className='text-xs uppercase tracking-wider text-zinc-400 font-bold ml-1'>
+                                        <label className='text-xs uppercase tracking-wider text-gray-600 font-bold ml-1'>
                                             Password
                                         </label>
                                         <div className='relative'>
-                                            <Lock className='absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 z-10' />
+                                            <Lock className='absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 z-10' />
                                             <PasswordInput
-                                                className='w-full pl-12 py-3.5 bg-black/20 border border-white/10 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all font-medium'
+                                                className='w-full pl-12 py-3.5 bg-gray-50 border border-gray-300 rounded-xl text-slate-800 placeholder-gray-400 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all font-medium'
                                                 placeholder='******'
                                                 value={form.password}
                                                 onChange={(e) =>
@@ -209,13 +204,13 @@ export default function Signup() {
                                     </div>
 
                                     <div className='space-y-1.5'>
-                                        <label className='text-xs uppercase tracking-wider text-zinc-400 font-bold ml-1'>
+                                        <label className='text-xs uppercase tracking-wider text-gray-600 font-bold ml-1'>
                                             Confirm
                                         </label>
                                         <div className='relative'>
-                                            <Lock className='absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 z-10' />
+                                            <Lock className='absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 z-10' />
                                             <PasswordInput
-                                                className='w-full pl-12 py-3.5 bg-black/20 border border-white/10 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all font-medium'
+                                                className='w-full pl-12 py-3.5 bg-gray-50 border border-gray-300 rounded-xl text-slate-800 placeholder-gray-400 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all font-medium'
                                                 placeholder='******'
                                                 value={form.confirmPassword}
                                                 onChange={(e) =>
@@ -231,18 +226,18 @@ export default function Signup() {
                                 <button
                                     type='submit'
                                     disabled={loading}
-                                    className='w-full mt-4 bg-white text-black font-bold py-3.5 rounded-xl hover:bg-zinc-200 transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-white/10 flex items-center justify-center gap-2'
+                                    className='w-full mt-4 bg-indigo-600 text-white font-bold py-3.5 rounded-xl hover:bg-indigo-700 transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2'
                                 >
                                     {loading ? 'Creating...' : 'Create Account'}
                                     {!loading && <ArrowRight className='w-4 h-4' />}
                                 </button>
 
                                 <div className='text-center mt-4'>
-                                    <p className='text-zinc-500 text-sm'>
+                                    <p className='text-gray-600 text-sm'>
                                         Already have an account?{' '}
                                         <Link
                                             href='/login'
-                                            className='text-indigo-400 hover:text-indigo-300 font-semibold transition-colors'
+                                            className='text-indigo-600 hover:text-indigo-500 font-semibold transition-colors'
                                         >
                                             Login
                                         </Link>
@@ -259,20 +254,20 @@ export default function Signup() {
                                 className='space-y-6'
                             >
                                 <div className='space-y-2'>
-                                    <label className='text-xs uppercase tracking-wider text-zinc-400 font-bold ml-1 text-center block'>
+                                    <label className='text-xs uppercase tracking-wider text-gray-600 font-bold ml-1 text-center block'>
                                         One-Time Password
                                     </label>
                                     <input
                                         type='text'
                                         placeholder='000000'
-                                        className='w-full p-4 bg-black/30 border border-indigo-500/30 rounded-2xl text-white focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all font-mono text-center text-3xl tracking-[1em]'
+                                        className='w-full p-4 bg-gray-50 border border-indigo-300 rounded-2xl text-slate-800 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all font-mono text-center text-3xl tracking-[1em]'
                                         value={form.otp}
                                         onChange={(e) => setForm({ ...form, otp: e.target.value })}
                                         required
                                         maxLength={6}
                                         autoFocus
                                     />
-                                    <p className='text-center text-zinc-500 text-xs'>
+                                    <p className='text-center text-gray-500 text-xs'>
                                         Enter the 6-digit code sent to your email
                                     </p>
                                 </div>
@@ -281,7 +276,7 @@ export default function Signup() {
                                     <button
                                         type='button'
                                         onClick={() => setStep(1)}
-                                        className='flex-1 px-4 py-3.5 rounded-xl border border-white/10 text-zinc-400 hover:bg-white/5 hover:text-white transition-colors font-medium'
+                                        className='flex-1 px-4 py-3.5 rounded-xl border border-gray-300 text-gray-600 hover:bg-gray-50 hover:text-slate-800 transition-colors font-medium'
                                     >
                                         Back
                                     </button>
