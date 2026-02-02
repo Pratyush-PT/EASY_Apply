@@ -1,14 +1,18 @@
 @import "tailwindcss";
 
 :root {
-  --background: #020617; /* Deep midnight blue/black */
-  --foreground: #ffffff;
-  --card: rgba(255, 255, 255, 0.03);
-  --card-hover: rgba(255, 255, 255, 0.07);
-  --border: rgba(255, 255, 255, 0.1);
-  --primary: #4F46E5; /* Indigo 600 */
-  --secondary: #ec4899; /* Pink 500 */
-  color-scheme: dark;
+  --background: #f8fafc;
+  /* Light gray background */
+  --foreground: #1e293b;
+  /* Dark slate text */
+  --card: rgba(255, 255, 255, 0.8);
+  --card-hover: rgba(255, 255, 255, 0.95);
+  --border: rgba(0, 0, 0, 0.1);
+  --primary: #4F46E5;
+  /* Indigo 600 */
+  --secondary: #ec4899;
+  /* Pink 500 */
+  color-scheme: light;
 }
 
 @theme inline {
@@ -24,75 +28,92 @@ body {
   font-family: var(--font-inter), sans-serif;
   overflow-x: hidden;
   min-height: 100vh;
-  /* Subtle mesh gradient background */
-  background-image: 
-    radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0, transparent 50%), 
-    radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.15) 0, transparent 50%);
-  background-attachment: fixed;
 }
 
-/* Glassmorphism Utilities */
+/* Modal animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Card Utilities */
 .glass {
   background: var(--card);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border);
 }
 
 .glass-card {
-  background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.08);
 }
 
 .glass-hover:hover {
   background: var(--card-hover);
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(0, 0, 0, 0.15);
   transform: translateY(-2px);
-  box-shadow: 0 12px 40px 0 rgba(79, 70, 229, 0.1);
+  box-shadow: 0 8px 24px 0 rgba(79, 70, 229, 0.1);
 }
 
 .text-gradient {
-  background: linear-gradient(to right, #ffffff, #94a3b8);
+  background: linear-gradient(to right, #1e293b, #475569);
   -webkit-background-clip: text;
   color: transparent;
 }
 
 .text-gradient-primary {
-  background: linear-gradient(to right, #818cf8, #c084fc, #f472b6);
+  background: linear-gradient(to right, #4F46E5, #7c3aed, #c026d3);
   -webkit-background-clip: text;
   color: transparent;
 }
 
 /* Input Styles */
 .input-glass {
-  background: rgba(0, 0, 0, 0.2);
+  background: #ffffff;
   border: 1px solid var(--border);
-  color: white;
+  color: #1e293b;
   transition: all 0.3s ease;
 }
 
 .input-glass:focus {
   border-color: #6366f1;
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
-  background: rgba(0, 0, 0, 0.4);
+  background: #ffffff;
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
+
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #f1f5f9;
 }
+
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.15);
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.25);
 }
 
 /* Hide spin buttons for number inputs */
@@ -101,6 +122,7 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
 input[type="number"] {
   -moz-appearance: textfield;
 }

@@ -32,8 +32,8 @@ export default function RootLayout({ children }) {
           ${geistMono.variable}
           ${inter.variable}
           antialiased
-          bg-black
-          text-white
+          bg-slate-50
+          text-slate-800
         `}
       >
         {children}

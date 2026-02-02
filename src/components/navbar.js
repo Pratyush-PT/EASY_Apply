@@ -24,8 +24,8 @@ function NavLink({ href, children, icon: Icon, active }) {
             className={cn(
                 'relative group flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300',
                 active
-                    ? 'text-white bg-white/10 shadow-[0_0_15px_rgba(255,255,255,0.1)]'
-                    : 'text-zinc-400 hover:text-white hover:bg-white/5',
+                    ? 'text-slate-800 bg-gray-100 shadow-sm'
+                    : 'text-gray-600 hover:text-slate-800 hover:bg-gray-50',
             )}
         >
             {Icon && <Icon className='w-4 h-4' />}
@@ -34,7 +34,7 @@ function NavLink({ href, children, icon: Icon, active }) {
             {active && (
                 <motion.div
                     layoutId='navbar-indicator'
-                    className='absolute inset-0 rounded-full border border-white/10'
+                    className='absolute inset-0 rounded-full border border-gray-200'
                     initial={false}
                     transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                 />
@@ -97,14 +97,14 @@ export default function Navbar() {
             className={cn(
                 'fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-transparent',
                 scrolled || isOpen
-                    ? 'bg-black/80 backdrop-blur-xl border-white/5 shadow-2xl'
+                    ? 'bg-white/95 backdrop-blur-sm border-gray-200 shadow-sm'
                     : 'bg-transparent',
             )}
         >
             <div className='max-w-7xl mx-auto px-6 h-20 flex items-center justify-between'>
                 {/* Logo */}
                 <Link href={isLoggedIn ? '/jobs' : '/'} className='relative group'>
-                    <span className='text-2xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent group-hover:to-white transition-all'>
+                    <span className='text-2xl font-bold text-slate-800 group-hover:text-indigo-600 transition-all'>
                         EasyApply
                     </span>
                     <div className='absolute -bottom-1 left-0 w-0 h-[2px] bg-gradient-to-r from-indigo-500 to-pink-500 group-hover:w-full transition-all duration-300' />
@@ -141,7 +141,7 @@ export default function Navbar() {
                             </NavLink>
                             <Link
                                 href='/login'
-                                className='ml-2 px-6 py-2 rounded-full bg-white text-black font-semibold hover:bg-gray-100 transition-all shadow-[0_0_15px_rgba(255,255,255,0.3)] hover:shadow-[0_0_25px_rgba(255,255,255,0.5)] transform hover:-translate-y-0.5'
+                                className='ml-2 px-6 py-2 rounded-full bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5'
                             >
                                 Login
                             </Link>
@@ -151,7 +151,7 @@ export default function Navbar() {
 
                 {/* Mobile Menu Button */}
                 <button
-                    className='md:hidden text-white p-2'
+                    className='md:hidden text-slate-800 p-2'
                     onClick={() => setIsOpen(!isOpen)}
                 >
                     {isOpen ? <X className='w-6 h-6' /> : <Menu className='w-6 h-6' />}
@@ -165,7 +165,7 @@ export default function Navbar() {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
-                        className='md:hidden bg-black/95 backdrop-blur-xl border-t border-white/10 overflow-hidden'
+                        className='md:hidden bg-white/95 backdrop-blur-sm border-t border-gray-200 overflow-hidden'
                     >
                         <div className='flex flex-col p-6 space-y-4'>
                             {isLoggedIn ? (
@@ -181,7 +181,7 @@ export default function Navbar() {
                                     </MobileLink>
                                     <button
                                         onClick={handleLogout}
-                                        className='flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-red-600/20 text-red-400 border border-red-600/30'
+                                        className='flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-red-100 text-red-600 border border-red-200'
                                     >
                                         <LogOut className='w-4 h-4' /> Logout
                                     </button>
@@ -217,8 +217,8 @@ function MobileLink({ href, children, icon: Icon }) {
             className={cn(
                 'flex items-center gap-3 p-3 rounded-xl transition-all',
                 isActive
-                    ? 'bg-white/10 text-white'
-                    : 'text-zinc-400 hover:text-white hover:bg-white/5',
+                    ? 'bg-gray-100 text-slate-800'
+                    : 'text-gray-600 hover:text-slate-800 hover:bg-gray-50',
             )}
         >
             {Icon && <Icon className='w-5 h-5' />}
