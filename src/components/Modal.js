@@ -1,6 +1,34 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { CheckCircle, AlertTriangle, XCircle, Info } from "lucide-react";
+
+const TYPE_CONFIG = {
+    info: {
+        icon: Info,
+        iconClass: "text-indigo-600",
+        bgClass: "bg-indigo-50",
+        btnClass: "bg-indigo-600 hover:bg-indigo-700 text-white",
+    },
+    success: {
+        icon: CheckCircle,
+        iconClass: "text-green-600",
+        bgClass: "bg-green-50",
+        btnClass: "bg-green-600 hover:bg-green-700 text-white",
+    },
+    error: {
+        icon: XCircle,
+        iconClass: "text-red-600",
+        bgClass: "bg-red-50",
+        btnClass: "bg-red-600 hover:bg-red-700 text-white",
+    },
+    warning: {
+        icon: AlertTriangle,
+        iconClass: "text-amber-600",
+        bgClass: "bg-amber-50",
+        btnClass: "bg-amber-500 hover:bg-amber-600 text-white",
+    },
+};
 
 export default function Modal({
     isOpen,
@@ -11,112 +39,78 @@ export default function Modal({
     primaryLabel = "OK",
     secondaryAction,
     secondaryLabel,
-    type = "info", // 'info', 'success', 'error', 'warning'
+    type = "info",
 }) {
     const modalRef = useRef(null);
+    const config = TYPE_CONFIG[type] || TYPE_CONFIG.info;
+    const Icon = config.icon;
 
-    // Close on Escape key
     useEffect(() => {
         const handleEscape = (e) => {
-            if (e.key === "Escape" && isOpen) {
-                onClose();
-            }
+            if (e.key === "Escape" && isOpen) onClose();
         };
         document.addEventListener("keydown", handleEscape);
         return () => document.removeEventListener("keydown", handleEscape);
     }, [isOpen, onClose]);
 
-    // Focus trap
     useEffect(() => {
-        if (isOpen && modalRef.current) {
-            modalRef.current.focus();
-        }
+        if (isOpen && modalRef.current) modalRef.current.focus();
     }, [isOpen]);
 
     if (!isOpen) return null;
 
-    const typeStyles = {
-        info: "bg-indigo-100 text-indigo-600",
-        success: "bg-green-100 text-green-600",
-        error: "bg-red-100 text-red-600",
-        warning: "bg-amber-100 text-amber-600",
-    };
-
-    const typeIcons = {
-        info: (
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-        ),
-        success: (
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-        ),
-        error: (
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-        ),
-        warning: (
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-        ),
-    };
-
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
             role="dialog"
             aria-modal="true"
             aria-labelledby="modal-title"
         >
             {/* Overlay */}
             <div
-                className="absolute inset-0 bg-black/40 animate-[fadeIn_250ms_ease-out]"
+                className="absolute inset-0 bg-black/30 backdrop-blur-sm"
                 onClick={onClose}
             />
 
-            {/* Modal */}
+            {/* Card */}
             <div
                 ref={modalRef}
                 tabIndex={-1}
-                className="relative bg-white rounded-2xl shadow-xl max-w-md w-[90%] mx-4 p-6 animate-[modalIn_250ms_ease-out]"
+                className="relative bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 outline-none animate-fade-in"
             >
                 {/* Icon */}
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 ${typeStyles[type]}`}>
-                    {typeIcons[type]}
+                <div className={`w-12 h-12 rounded-xl ${config.bgClass} flex items-center justify-center mx-auto mb-5`}>
+                    <Icon className={`w-6 h-6 ${config.iconClass}`} />
                 </div>
 
                 {/* Title */}
                 {title && (
                     <h2
                         id="modal-title"
-                        className="text-xl font-semibold text-slate-800 text-center mb-3"
+                        className="text-lg font-semibold text-gray-900 text-center mb-2"
                     >
                         {title}
                     </h2>
                 )}
 
                 {/* Message */}
-                <p className="text-gray-600 text-center whitespace-pre-line mb-6">
+                <p className="text-sm text-gray-500 text-center whitespace-pre-line leading-relaxed mb-7">
                     {message}
                 </p>
 
                 {/* Actions */}
-                <div className={`flex gap-3 ${secondaryAction ? 'justify-between' : 'justify-center'}`}>
+                <div className={`flex gap-3 ${secondaryAction ? '' : 'justify-center'}`}>
                     {secondaryAction && (
                         <button
                             onClick={secondaryAction}
-                            className="flex-1 px-4 py-2.5 rounded-xl border border-gray-300 text-gray-600 font-medium hover:bg-gray-50 transition-colors"
+                            className="flex-1 btn btn-secondary"
                         >
                             {secondaryLabel}
                         </button>
                     )}
                     <button
                         onClick={primaryAction || onClose}
-                        className="flex-1 px-4 py-2.5 rounded-xl bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors"
+                        className={`flex-1 btn font-medium ${config.btnClass} border-transparent rounded-lg`}
                     >
                         {primaryLabel}
                     </button>
