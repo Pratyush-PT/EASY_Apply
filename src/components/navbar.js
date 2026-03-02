@@ -4,41 +4,25 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-    Menu,
-    X,
-    Briefcase,
-    User,
-    LogOut,
-    Home,
-    UserPlus,
-    LogIn,
-    CheckCircle,
-} from 'lucide-react'
+import { Briefcase, User, LogOut, Menu, X, CheckSquare } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-function NavLink({ href, children, icon: Icon, active }) {
+function NavLink({ href, children, icon: Icon }) {
+    const pathname = usePathname()
+    const active = pathname === href
+
     return (
         <Link
             href={href}
             className={cn(
-                'relative group flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300',
+                'flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-150',
                 active
-                    ? 'text-slate-800 bg-gray-100 shadow-sm'
-                    : 'text-gray-600 hover:text-slate-800 hover:bg-gray-50',
+                    ? 'bg-indigo-50 text-indigo-700'
+                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
             )}
         >
-            {Icon && <Icon className='w-4 h-4' />}
+            {Icon && <Icon className="w-4 h-4 flex-shrink-0" />}
             {children}
-
-            {active && (
-                <motion.div
-                    layoutId='navbar-indicator'
-                    className='absolute inset-0 rounded-full border border-gray-200'
-                    initial={false}
-                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                />
-            )}
         </Link>
     )
 }
@@ -48,18 +32,11 @@ export default function Navbar() {
     const router = useRouter()
     const [isLoggedIn, setIsLoggedIn] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
-    const [scrolled, setScrolled] = useState(false)
-
-    useEffect(() => {
-        const handleScroll = () => setScrolled(window.scrollY > 20)
-        window.addEventListener('scroll', handleScroll)
-        return () => window.removeEventListener('scroll', handleScroll)
-    }, [])
 
     useEffect(() => {
         const checkAuth = async () => {
             const studentPages = ['/jobs', '/applications', '/profile']
-            if (studentPages.some((page) => pathname.startsWith(page))) {
+            if (studentPages.some((p) => pathname.startsWith(p))) {
                 setIsLoggedIn(true)
                 return
             }
@@ -82,121 +59,101 @@ export default function Navbar() {
     const handleLogout = async () => {
         try {
             await fetch('/api/auth/logout', { method: 'POST' })
-            setIsLoggedIn(false)
-            router.push('/login')
-        } catch {
-            setIsLoggedIn(false)
-            router.push('/login')
-        }
+        } catch { }
+        setIsLoggedIn(false)
+        router.push('/login')
     }
 
-    const isActive = (path) => pathname === path
-
     return (
-        <nav
-            className={cn(
-                'fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-transparent',
-                scrolled || isOpen
-                    ? 'bg-white/95 backdrop-blur-sm border-gray-200 shadow-sm'
-                    : 'bg-transparent',
-            )}
-        >
-            <div className='max-w-7xl mx-auto px-6 h-20 flex items-center justify-between'>
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100">
+            <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+
                 {/* Logo */}
-                <Link href={isLoggedIn ? '/jobs' : '/'} className='relative group'>
-                    <span className='text-2xl font-bold text-slate-800 group-hover:text-indigo-600 transition-all'>
+                <Link
+                    href={isLoggedIn ? '/jobs' : '/'}
+                    className="flex items-center gap-2 select-none"
+                >
+                    <span className="w-2 h-2 rounded-full bg-indigo-600 flex-shrink-0" />
+                    <span className="text-base font-semibold text-gray-900 tracking-tight">
                         EasyApply
                     </span>
-                    <div className='absolute -bottom-1 left-0 w-0 h-[2px] bg-gradient-to-r from-indigo-500 to-pink-500 group-hover:w-full transition-all duration-300' />
                 </Link>
 
                 {/* Desktop Nav */}
-                <div className='hidden md:flex items-center gap-2'>
+                <div className="hidden md:flex items-center gap-1">
                     {isLoggedIn ? (
                         <>
-                            <NavLink href='/jobs' icon={Briefcase}>
-                                Jobs
-                            </NavLink>
-                            <NavLink href='/applications' icon={CheckCircle}>
-                                My Applications
-                            </NavLink>
-                            <NavLink href='/profile' icon={User}>
-                                Profile
-                            </NavLink>
+                            <NavLink href="/jobs" icon={Briefcase}>Jobs</NavLink>
+                            <NavLink href="/applications" icon={CheckSquare}>Applications</NavLink>
+                            <NavLink href="/profile" icon={User}>Profile</NavLink>
+
+                            <div className="w-px h-5 bg-gray-200 mx-2" />
+
                             <button
                                 onClick={handleLogout}
-                                className='ml-4 flex items-center gap-2 px-5 py-2 rounded-full bg-gradient-to-r from-red-600 to-rose-600 text-white text-sm font-medium hover:shadow-[0_0_20px_rgba(225,29,72,0.4)] transition-all duration-300 transform hover:scale-105'
+                                className="flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-red-600 hover:bg-red-50 transition-all duration-150"
                             >
-                                <LogOut className='w-4 h-4' />
+                                <LogOut className="w-4 h-4" />
                                 Logout
                             </button>
                         </>
                     ) : (
                         <>
-                            <NavLink href='/' icon={Home}>
-                                Home
-                            </NavLink>
-                            <NavLink href='/signup' icon={UserPlus}>
-                                Signup
-                            </NavLink>
                             <Link
-                                href='/login'
-                                className='ml-2 px-6 py-2 rounded-full bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5'
+                                href="/signup"
+                                className="px-3.5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all duration-150"
                             >
-                                Login
+                                Sign up
+                            </Link>
+                            <Link
+                                href="/login"
+                                className="ml-1 btn btn-primary btn-sm"
+                            >
+                                Log in
                             </Link>
                         </>
                     )}
                 </div>
 
-                {/* Mobile Menu Button */}
+                {/* Mobile Toggle */}
                 <button
-                    className='md:hidden text-slate-800 p-2'
+                    className="md:hidden p-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all"
                     onClick={() => setIsOpen(!isOpen)}
+                    aria-label="Toggle menu"
                 >
-                    {isOpen ? <X className='w-6 h-6' /> : <Menu className='w-6 h-6' />}
+                    {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                 </button>
             </div>
 
-            {/* Mobile Dropdown */}
+            {/* Mobile Drawer */}
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
-                        className='md:hidden bg-white/95 backdrop-blur-sm border-t border-gray-200 overflow-hidden'
+                        transition={{ duration: 0.2 }}
+                        className="md:hidden bg-white border-t border-gray-100 overflow-hidden"
                     >
-                        <div className='flex flex-col p-6 space-y-4'>
+                        <div className="px-6 py-4 flex flex-col gap-1">
                             {isLoggedIn ? (
                                 <>
-                                    <MobileLink href='/jobs' icon={Briefcase}>
-                                        Jobs
-                                    </MobileLink>
-                                    <MobileLink href='/applications' icon={CheckCircle}>
-                                        Applications
-                                    </MobileLink>
-                                    <MobileLink href='/profile' icon={User}>
-                                        Profile
-                                    </MobileLink>
+                                    <MobileLink href="/jobs" icon={Briefcase}>Jobs</MobileLink>
+                                    <MobileLink href="/applications" icon={CheckSquare}>Applications</MobileLink>
+                                    <MobileLink href="/profile" icon={User}>Profile</MobileLink>
+                                    <hr className="my-2 border-gray-100" />
                                     <button
                                         onClick={handleLogout}
-                                        className='flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-red-100 text-red-600 border border-red-200'
+                                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-all"
                                     >
-                                        <LogOut className='w-4 h-4' /> Logout
+                                        <LogOut className="w-4 h-4" />
+                                        Logout
                                     </button>
                                 </>
                             ) : (
                                 <>
-                                    <MobileLink href='/' icon={Home}>
-                                        Home
-                                    </MobileLink>
-                                    <MobileLink href='/signup' icon={UserPlus}>
-                                        Signup
-                                    </MobileLink>
-                                    <MobileLink href='/login' icon={LogIn}>
-                                        Login
-                                    </MobileLink>
+                                    <MobileLink href="/signup">Sign up</MobileLink>
+                                    <MobileLink href="/login">Log in</MobileLink>
                                 </>
                             )}
                         </div>
@@ -209,19 +166,19 @@ export default function Navbar() {
 
 function MobileLink({ href, children, icon: Icon }) {
     const pathname = usePathname()
-    const isActive = pathname === href
+    const active = pathname === href
 
     return (
         <Link
             href={href}
             className={cn(
-                'flex items-center gap-3 p-3 rounded-xl transition-all',
-                isActive
-                    ? 'bg-gray-100 text-slate-800'
-                    : 'text-gray-600 hover:text-slate-800 hover:bg-gray-50',
+                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all',
+                active
+                    ? 'bg-indigo-50 text-indigo-700'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             )}
         >
-            {Icon && <Icon className='w-5 h-5' />}
+            {Icon && <Icon className="w-4 h-4 flex-shrink-0" />}
             {children}
         </Link>
     )
