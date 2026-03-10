@@ -179,8 +179,45 @@ export default function JobsPage() {
           isInterested ? s.delete(jobId) : s.add(jobId)
           return s
         })
+      } else {
+        const data = await res.json().catch(() => ({}))
+        if (
+          data.error?.toLowerCase().includes('profile') ||
+          data.error?.toLowerCase().includes('fill all')
+        ) {
+          showModal({
+            title: 'Complete Your Profile',
+            message: data.error || 'Please complete your profile before marking interest.',
+            type: 'warning',
+            primaryLabel: 'Go to Profile',
+            primaryAction: () => {
+              closeModal()
+              router.push('/profile')
+            },
+            secondaryLabel: 'Cancel',
+            secondaryAction: closeModal,
+          })
+        } else if (res.status === 401) {
+          showModal({
+            title: 'Unauthorized',
+            message: data.error || 'Please log in as a student to mark interest.',
+            type: 'error',
+          })
+        } else {
+          showModal({
+            title: 'Cannot Mark Interest',
+            message: data.error || 'Unable to mark interest. Please try again.',
+            type: 'error',
+          })
+        }
       }
-    } catch {}
+    } catch {
+      showModal({
+        title: 'Error',
+        message: 'Something went wrong. Please try again.',
+        type: 'error',
+      })
+    }
   }
 
   if (loading) {
