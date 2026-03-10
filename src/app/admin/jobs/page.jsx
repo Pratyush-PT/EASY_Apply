@@ -1,56 +1,70 @@
-"use client";
+'use client'
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Plus, Pencil, Trash2, ExternalLink, Calendar, GraduationCap, Users, TrendingUp, Briefcase } from "lucide-react";
-import { motion } from "framer-motion";
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  ExternalLink,
+  Calendar,
+  GraduationCap,
+  Users,
+  TrendingUp,
+  Briefcase,
+} from 'lucide-react'
+import { motion } from 'framer-motion'
 
 export default function AdminJobsPage() {
-  const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [deletingId, setDeletingId] = useState(null);
-  const [error, setError] = useState(null); // Added setError state
-  const router = useRouter();
+  const [jobs, setJobs] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [deletingId, setDeletingId] = useState(null)
+  const [error, setError] = useState(null) // Added setError state
+  const router = useRouter()
 
   useEffect(() => {
-    let isMounted = true;
+    let isMounted = true
     const fetchJobs = async () => {
       try {
-        const res = await fetch("/api/admin/jobs", { credentials: "include" });
+        const res = await fetch('/api/admin/jobs', { credentials: 'include' })
         if (!res.ok) {
           if ([401, 403].includes(res.status)) {
-            router.push("/login");
-            return;
+            router.push('/login')
+            return
           }
-          throw new Error("Failed to fetch jobs");
+          throw new Error('Failed to fetch jobs')
         }
-        const data = await res.json();
-        if (isMounted) setJobs(data.jobs || []);
+        const data = await res.json()
+        if (isMounted) setJobs(data.jobs || [])
       } catch (err) {
-        if (isMounted) setError(err.message);
+        if (isMounted) setError(err.message)
       } finally {
-        if (isMounted) setLoading(false);
+        if (isMounted) setLoading(false)
       }
-    };
-    fetchJobs();
-    return () => { isMounted = false; };
-  }, [router]);
+    }
+    fetchJobs()
+    return () => {
+      isMounted = false
+    }
+  }, [router])
 
   const handleDelete = async (jobId) => {
-    setDeletingId(jobId);
+    setDeletingId(jobId)
     try {
-      await fetch(`/api/admin/jobs/${jobId}`, { method: "DELETE" });
-      setJobs((prev) => prev.filter((j) => j._id !== jobId));
-    } catch { }
-    finally { setDeletingId(null); }
-  };
+      await fetch(`/api/admin/jobs/${jobId}`, { method: 'DELETE' })
+      setJobs((prev) => prev.filter((j) => j._id !== jobId))
+    } catch {
+    } finally {
+      setDeletingId(null)
+    }
+  }
 
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
       </div>
-    );
+    )
   }
 
   return (
@@ -58,10 +72,12 @@ export default function AdminJobsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Jobs</h1>
-          <p className="text-sm text-slate-500 mt-1">{jobs.length} job{jobs.length !== 1 ? 's' : ''} posted</p>
+          <p className="text-sm text-slate-500 mt-1">
+            {jobs.length} job{jobs.length !== 1 ? 's' : ''} posted
+          </p>
         </div>
         <button
-          onClick={() => router.push("/admin/jobs/create")}
+          onClick={() => router.push('/admin/jobs/create')}
           className="btn btn-primary w-full sm:w-auto flex justify-center"
         >
           <Plus className="w-4 h-4" />
@@ -76,7 +92,8 @@ export default function AdminJobsPage() {
         </div>
       ) : (
         <motion.div
-          initial="hidden" animate="visible"
+          initial="hidden"
+          animate="visible"
           variants={{ visible: { transition: { staggerChildren: 0.05 } } }}
           className="space-y-3"
         >
@@ -85,7 +102,7 @@ export default function AdminJobsPage() {
               key={job._id}
               variants={{
                 hidden: { opacity: 0, y: 12 },
-                visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: "easeInOut" } }
+                visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: 'easeInOut' } },
               }}
               className="bg-white border border-slate-200 shadow-sm hover:shadow-md rounded-2xl p-4 sm:p-5 hover:border-indigo-100 transition-all duration-200 group"
             >
@@ -127,31 +144,41 @@ export default function AdminJobsPage() {
               <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs font-medium text-slate-500 mb-4">
                 <div className="flex items-center gap-1.5">
                   <Calendar className="w-4 h-4 text-slate-400" />
-                  {job.deadline ? new Date(job.deadline).toLocaleDateString("en-GB") : "No deadline"}
+                  {job.deadline
+                    ? 'Deadline: ' + new Date(job.deadline).toLocaleDateString('en-GB')
+                    : 'No deadline'}
                 </div>
                 <div className="flex items-center gap-1.5">
                   <GraduationCap className="w-4 h-4 text-slate-400" />
-                  Min. CGPA {job.minCgpa ?? "N/A"}
+                  Min. CGPA: {job.minCgpa ?? 'N/A'}
                 </div>
                 {job.eligibleBranches?.length > 0 && (
-                  <span className="text-slate-500">
-                    {job.eligibleBranches.join(", ")}
-                  </span>
+                  <span className="text-slate-500">{job.eligibleBranches.join(', ')}</span>
                 )}
               </div>
 
               {job.description && (
-                <p className="text-sm text-slate-600 mb-4 line-clamp-2 leading-relaxed">{job.description}</p>
+                <p className="text-sm text-slate-600 mb-4 line-clamp-2 leading-relaxed">
+                  {job.description}
+                </p>
               )}
 
               <div className="flex gap-6 pt-4 border-t border-slate-100 text-sm">
                 <div className="flex items-center gap-2 text-slate-500">
                   <Users className="w-4 h-4 text-emerald-500" />
-                  <span>Applied: <span className="font-semibold text-emerald-600">{job.appliedCount || 0}</span></span>
+                  <span>
+                    Applied:{' '}
+                    <span className="font-semibold text-emerald-600">{job.appliedCount || 0}</span>
+                  </span>
                 </div>
                 <div className="flex items-center gap-2 text-slate-500">
                   <TrendingUp className="w-4 h-4 text-amber-500" />
-                  <span>Interested: <span className="font-semibold text-amber-600">{job.interestedNotApplied || 0}</span></span>
+                  <span>
+                    Interested:{' '}
+                    <span className="font-semibold text-amber-600">
+                      {job.interestedNotApplied || 0}
+                    </span>
+                  </span>
                 </div>
               </div>
             </motion.div>
@@ -159,5 +186,5 @@ export default function AdminJobsPage() {
         </motion.div>
       )}
     </div>
-  );
+  )
 }
